@@ -14,8 +14,22 @@ services:
     networks:
       - boilerplater-network
 
+  valkey:
+    image: valkey/valkey:7.2
+    container_name: boilerplater-valkey
+    restart: unless-stopped
+    environment:
+      VALKEY_PASSWORD: ${CACHE_PASSWORD:-}
+    ports:
+      - "${CACHE_PORT}:6379"
+    networks:
+      - boilerplater-network
+    volumes:
+      - valkey_data:/data
+
 volumes:
   postgres_data:
+  valkey_data:
 
 networks:
   boilerplater-network:

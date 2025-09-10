@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { RepositoryContext, UnitOfWork } from "../ports/unit-of-work.service";
-import { UserCommandDrizzleRepo } from "src/users/application/adapters/user-command-drizzle-repo.adapter";
+import { UserCommandDrizzleRepo } from "src/users/application/adapters/user-command-drizzle-repo.service";
 import { db } from "src/db";
 
 @Injectable()

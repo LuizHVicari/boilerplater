@@ -1,5 +1,5 @@
 import { UserModel } from "src/users/domain/models/user.model";
-import { ListUserProps, UserQueryRepository } from "../ports/user-query-repo.port";
+import { ListUserProps, UserQueryRepository } from "../ports/user-query-repo.service";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { usersTable } from "src/db/schema";
 import { and, count, eq, gte, like, lte, or, SQL } from "drizzle-orm";

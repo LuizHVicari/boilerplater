@@ -1,16 +1,20 @@
-import { Injectable } from "@nestjs/common";
-import { UserCommandRepository } from "../ports/user-command-repo.port";
+import { Inject, Injectable } from "@nestjs/common";
+import { UserCommandRepository } from "../ports/user-command-repo.service";
 import { UserModel } from "../../domain/models/user.model";
 import { usersTable } from "src/db/schema";
-import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { eq } from "drizzle-orm";
 import { UserModelSchemaMapper } from "./user-model-schema-mapper";
+import { DB_TOKEN } from "src/db";
+import { NodePgDatabase } from "drizzle-orm/node-postgres";
 
 @Injectable()
 export class UserCommandDrizzleRepo implements UserCommandRepository {
   private readonly mapper = new UserModelSchemaMapper();
 
-  constructor(private readonly db: PostgresJsDatabase) {}
+  constructor(
+    @Inject(DB_TOKEN)
+    private readonly db: NodePgDatabase,
+  ) {}
 
   async createUser(user: UserModel): Promise<UserModel> {
     const newUser = this.mapper.model2DB(user);

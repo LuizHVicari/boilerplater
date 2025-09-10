@@ -6,6 +6,7 @@ import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
 import { join } from "path";
 import { UsersModule } from "./users/users.module";
 import { CommonModule } from "./common/common.module";
+import { ConfigModule } from "@nestjs/config";
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { CommonModule } from "./common/common.module";
       sortSchema: true,
       playground: true,
     }),
+    ConfigModule.forRoot(),
     UsersModule,
     CommonModule,
   ],
