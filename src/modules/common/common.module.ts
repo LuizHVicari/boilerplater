@@ -1,5 +1,5 @@
 import { Global, Module } from "@nestjs/common";
-import { db, DB_TOKEN } from "../db";
+import { db, DB_TOKEN } from "../../db";
 import { UNIT_OF_WORK } from "./application/ports/unit-of-work.service";
 import { DrizzleUnitOfWork } from "./application/adapters/drizzle-unit-of-work.service";
 import { ConfigModule } from "@nestjs/config";

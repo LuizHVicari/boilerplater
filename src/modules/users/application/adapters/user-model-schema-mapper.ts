@@ -1,5 +1,5 @@
 import { DBNewUser, DBUser } from "src/db/schema";
-import { UserModel } from "src/users/domain/models/user.model";
+import { UserModel } from "src/modules/users/domain/models/user.model";
 
 export class UserModelSchemaMapper {
   model2DB(user: UserModel): DBNewUser {

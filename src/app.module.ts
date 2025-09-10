@@ -4,8 +4,8 @@ import { AppService } from "./app.service";
 import { GraphQLModule } from "@nestjs/graphql";
 import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
 import { join } from "path";
-import { UsersModule } from "./users/users.module";
-import { CommonModule } from "./common/common.module";
+import { UsersModule } from "./modules/users/users.module";
+import { CommonModule } from "./modules/common/common.module";
 import { ConfigModule } from "@nestjs/config";
 
 @Module({

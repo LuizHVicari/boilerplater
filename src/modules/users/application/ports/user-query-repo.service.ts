@@ -1,4 +1,4 @@
-import { UserModel } from "src/users/domain/models/user.model";
+import { UserModel } from "src/modules/users/domain/models/user.model";
 
 export const USER_QUERY_REPOSITORY = Symbol("USER_QUERY_REPO");
 

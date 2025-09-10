@@ -1,4 +1,4 @@
-import { UserCommandRepository } from "src/users/application/ports/user-command-repo.service";
+import { UserCommandRepository } from "src/modules/users/application/ports/user-command-repo.service";
 
 export const UNIT_OF_WORK = Symbol("UNIT_Of_WORK");
 

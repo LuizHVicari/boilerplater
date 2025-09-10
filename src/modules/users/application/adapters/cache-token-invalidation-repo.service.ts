@@ -1,12 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { TokenInvalidationRepository } from "../ports/token-invalidation-repo.service";
-import { type CacheService } from "src/common/application/ports/cache.service";
+import { type CacheService } from "src/modules/common/application/ports/cache.service";
 import {
   ONE_DAY_SECONDS,
   TWO_WEEKS_SECONDS,
   ONE_HOUR_SECONDS,
 } from "src/shared/constants/time-units.constants";
-import { AuthToken } from "src/users/domain/value-objects/auth-token.vo";
+import { AuthToken } from "src/modules/users/domain/value-objects/auth-token.vo";
 import { millisecondsToSeconds } from "src/shared/utils/time";
 
 const EMAIL_VERIFICATION_TOKEN_TTL_SECONDS = ONE_DAY_SECONDS;

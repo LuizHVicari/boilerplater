@@ -1,4 +1,4 @@
-import { UserModel } from "src/users/domain/models/user.model";
+import { UserModel } from "src/modules/users/domain/models/user.model";
 import { ListUserProps, UserQueryRepository } from "../ports/user-query-repo.service";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { usersTable } from "src/db/schema";

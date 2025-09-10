@@ -1,4 +1,4 @@
-import { AuthToken } from "src/users/domain/value-objects/auth-token.vo";
+import { AuthToken } from "src/modules/users/domain/value-objects/auth-token.vo";
 
 export const TOKEN_INVALIDATION_REPOSITORY = Symbol("TOKEN_INVALIDATION_REPO");
 
