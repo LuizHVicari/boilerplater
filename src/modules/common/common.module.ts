@@ -2,14 +2,42 @@ import { Global, Module } from "@nestjs/common";
 import { db, DB_TOKEN } from "../../db";
 import { UNIT_OF_WORK } from "./application/ports/unit-of-work.service";
 import { DrizzleUnitOfWork } from "./application/adapters/drizzle-unit-of-work.service";
-import { ConfigModule } from "@nestjs/config";
+import { ConfigModule, ConfigType } from "@nestjs/config";
 import cacheConfig from "./config/cache.config";
 import { CACHE_SERVICE } from "./application/ports/cache.service";
 import { ValkeyCacheService } from "./application/adapters/valkey-cache.service";
+import { MailerModule } from "@nestjs-modules/mailer";
+import emailConfig from "./config/email.config";
+import { HandlebarsAdapter } from "@nestjs-modules/mailer/dist/adapters/handlebars.adapter";
 
 @Global()
 @Module({
-  imports: [ConfigModule.forFeature(cacheConfig)],
+  imports: [
+    ConfigModule.forFeature(cacheConfig),
+    ConfigModule.forFeature(emailConfig),
+    MailerModule.forRootAsync({
+      inject: [emailConfig.KEY],
+      useFactory: (config: ConfigType<typeof emailConfig>) => ({
+        transport: {
+          host: config.host,
+          port: config.port,
+          secure: config.secure,
+          auth: {
+            user: config.user,
+            pass: config.password,
+          },
+        },
+        defaults: {
+          from: config.sender,
+        },
+        template: {
+          dir: `${process.cwd()}/modules/common/templates`,
+          adapter: new HandlebarsAdapter(),
+          options: { strict: true },
+        },
+      }),
+    }),
+  ],
   providers: [
     {
       provide: DB_TOKEN,

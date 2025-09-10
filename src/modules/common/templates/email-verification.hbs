@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to {{appName}}</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2563eb;
+            margin-bottom: 10px;
+        }
+        .welcome-text {
+            font-size: 24px;
+            color: #1f2937;
+            margin-bottom: 20px;
+        }
+        .message {
+            font-size: 16px;
+            color: #6b7280;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+        .verify-button {
+            display: inline-block;
+            background-color: #2563eb;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            margin: 20px 0;
+            transition: background-color 0.3s;
+        }
+        .verify-button:hover {
+            background-color: #1d4ed8;
+        }
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+            font-size: 14px;
+            color: #9ca3af;
+            text-align: center;
+        }
+        .link-fallback {
+            word-break: break-all;
+            color: #6b7280;
+            font-size: 14px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">{{appName}}</div>
+        </div>
+        
+        <h1 class="welcome-text">Welcome, {{userName}}! 🎉</h1>
+        
+        <p class="message">
+            Thank you for joining us! We're excited to have you on board. 
+            To get started and secure your account, please verify your email address by clicking the button below.
+        </p>
+        
+        <div style="text-align: center;">
+            <a href="{{verificationUrl}}" class="verify-button">
+                Verify Email Address
+            </a>
+        </div>
+        
+        <p class="message">
+            This verification link will expire in <strong>{{expirationTime}}</strong>. 
+            If you didn't create an account with us, you can safely ignore this email.
+        </p>
+        
+        <div class="link-fallback">
+            <p><strong>Having trouble with the button?</strong> Copy and paste this link into your browser:</p>
+            <p>{{verificationUrl}}</p>
+        </div>
+        
+        <div class="footer">
+            <p>
+                Best regards,<br>
+                The {{appName}} Team
+            </p>
+            <p style="margin-top: 20px;">
+                If you have any questions, feel free to contact us at 
+                <a href="mailto:{{supportEmail}}" style="color: #2563eb;">{{supportEmail}}</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
