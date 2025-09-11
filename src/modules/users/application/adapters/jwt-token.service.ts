@@ -1,12 +1,13 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { TokenService } from "../ports/token.service";
-import { UserModel } from "../../domain/models/user.model";
-import { AuthToken } from "../../domain/value-objects/auth-token.vo";
-import { JwtService } from "@nestjs/jwt";
-import jwtConfig from "../../config/jwt.config";
 import { type ConfigType } from "@nestjs/config";
+import { JwtService } from "@nestjs/jwt";
 import { millisecondsToSeconds } from "src/shared/utils/time";
 import { v4 as uuidv4 } from "uuid";
+
+import jwtConfig from "../../config/jwt.config";
+import { UserModel } from "../../domain/models/user.model";
+import { AuthToken } from "../../domain/value-objects/auth-token.vo";
+import { TokenService } from "../ports/token.service";
 
 interface DecodedJwtPayload {
   sub: string;

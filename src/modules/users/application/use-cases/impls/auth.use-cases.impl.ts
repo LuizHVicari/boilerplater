@@ -8,12 +8,13 @@ import {
   type UnitOfWork,
 } from "src/modules/common/application/ports/unit-of-work.service";
 import { UserModel } from "src/modules/users/domain/models/user.model";
+
 import { PASSWORD_SERVICE, type PasswordService } from "../../ports/password.service";
+import { TOKEN_SERVICE, type TokenService } from "../../ports/token.service";
 import {
   TOKEN_INVALIDATION_REPOSITORY,
   type TokenInvalidationRepository,
 } from "../../ports/token-invalidation-repo.service";
-import { TOKEN_SERVICE, type TokenService } from "../../ports/token.service";
 import {
   USER_QUERY_REPOSITORY,
   type UserQueryRepository,

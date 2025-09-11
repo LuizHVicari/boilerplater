@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
-import { PasswordService } from "../ports/password.service";
 import * as bcrypt from "bcryptjs";
+
+import { PasswordService } from "../ports/password.service";
 
 const DEFAULT_SALT = 10;
 @Injectable()

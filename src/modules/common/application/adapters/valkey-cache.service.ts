@@ -1,8 +1,9 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { CacheService } from "../ports/cache.service";
-import Redis from "ioredis";
 import { type ConfigType } from "@nestjs/config";
+import Redis from "ioredis";
 import cacheConfig from "src/modules/common/config/cache.config";
+
+import { CacheService } from "../ports/cache.service";
 
 const DEFAULT_TTL_SECONDS = 60;
 

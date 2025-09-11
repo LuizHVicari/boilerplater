@@ -1,13 +1,14 @@
-import { Injectable, Inject } from "@nestjs/common";
-import { TokenInvalidationRepository } from "../ports/token-invalidation-repo.service";
+import { Inject, Injectable } from "@nestjs/common";
+import { type ConfigType } from "@nestjs/config";
 import {
   CACHE_SERVICE,
   type CacheService,
 } from "src/modules/common/application/ports/cache.service";
 import { AuthToken } from "src/modules/users/domain/value-objects/auth-token.vo";
 import { millisecondsToSeconds } from "src/shared/utils/time";
+
 import jwtConfig from "../../config/jwt.config";
-import { type ConfigType } from "@nestjs/config";
+import { TokenInvalidationRepository } from "../ports/token-invalidation-repo.service";
 
 @Injectable()
 export class CacheTokenInvalidationRepoService implements TokenInvalidationRepository {

@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
-import { EmailService, SendEmailProps } from "../ports/email.service";
 import { MailerService } from "@nestjs-modules/mailer";
+
+import { EmailService, SendEmailProps } from "../ports/email.service";
 
 @Injectable()
 export class NodeMailerEmailService implements EmailService {

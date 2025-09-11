@@ -1,12 +1,13 @@
 import { Inject, Injectable, UnauthorizedException } from "@nestjs/common";
-import { USER_QUERY_REPOSITORY, type UserQueryRepository } from "../ports/user-query-repo.service";
+import { millisecondsToSeconds } from "src/shared/utils/time";
+
+import { UserModel } from "../../domain/models/user.model";
+import { AuthToken } from "../../domain/value-objects/auth-token.vo";
 import {
   TOKEN_INVALIDATION_REPOSITORY,
   type TokenInvalidationRepository,
 } from "../ports/token-invalidation-repo.service";
-import { AuthToken } from "../../domain/value-objects/auth-token.vo";
-import { millisecondsToSeconds } from "src/shared/utils/time";
-import { UserModel } from "../../domain/models/user.model";
+import { USER_QUERY_REPOSITORY, type UserQueryRepository } from "../ports/user-query-repo.service";
 
 @Injectable()
 export class AuthValidationService {

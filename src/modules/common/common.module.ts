@@ -1,16 +1,17 @@
 import { Global, Module } from "@nestjs/common";
-import { db, DB_TOKEN } from "../../db";
-import { UNIT_OF_WORK } from "./application/ports/unit-of-work.service";
-import { DrizzleUnitOfWork } from "./application/adapters/drizzle-unit-of-work.service";
 import { ConfigModule, ConfigType } from "@nestjs/config";
-import cacheConfig from "./config/cache.config";
-import { CACHE_SERVICE } from "./application/ports/cache.service";
-import { ValkeyCacheService } from "./application/adapters/valkey-cache.service";
-import { EMAIL_SERVICE } from "./application/ports/email.service";
-import { NodeMailerEmailService } from "./application/adapters/node-mailer-email.service";
 import { MailerModule } from "@nestjs-modules/mailer";
-import emailConfig from "./config/email.config";
 import { HandlebarsAdapter } from "@nestjs-modules/mailer/dist/adapters/handlebars.adapter";
+
+import { db, DB_TOKEN } from "../../db";
+import { DrizzleUnitOfWork } from "./application/adapters/drizzle-unit-of-work.service";
+import { NodeMailerEmailService } from "./application/adapters/node-mailer-email.service";
+import { ValkeyCacheService } from "./application/adapters/valkey-cache.service";
+import { CACHE_SERVICE } from "./application/ports/cache.service";
+import { EMAIL_SERVICE } from "./application/ports/email.service";
+import { UNIT_OF_WORK } from "./application/ports/unit-of-work.service";
+import cacheConfig from "./config/cache.config";
+import emailConfig from "./config/email.config";
 
 @Global()
 @Module({

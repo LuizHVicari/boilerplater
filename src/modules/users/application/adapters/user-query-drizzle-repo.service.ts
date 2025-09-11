@@ -1,10 +1,11 @@
-import { UserModel } from "src/modules/users/domain/models/user.model";
-import { ListUserProps, UserQueryRepository } from "../ports/user-query-repo.service";
+import { and, count, eq, gte, like, lte, or, SQL } from "drizzle-orm";
+import { AnyPgColumn } from "drizzle-orm/pg-core";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { usersTable } from "src/db/schema";
-import { and, count, eq, gte, like, lte, or, SQL } from "drizzle-orm";
+import { UserModel } from "src/modules/users/domain/models/user.model";
+
+import { ListUserProps, UserQueryRepository } from "../ports/user-query-repo.service";
 import { UserModelSchemaMapper } from "./user-model-schema-mapper";
-import { AnyPgColumn } from "drizzle-orm/pg-core";
 
 export class UserQueryDrizzleRepository implements UserQueryRepository {
   private readonly mapper = new UserModelSchemaMapper();

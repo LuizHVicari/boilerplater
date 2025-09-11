@@ -1,12 +1,13 @@
 import { Inject, Injectable } from "@nestjs/common";
+import { type ConfigType } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { PassportStrategy } from "@nestjs/passport";
 import { ExtractJwt, Strategy } from "passport-jwt";
+
 import jwtConfig from "../../config/jwt.config";
-import { type ConfigType } from "@nestjs/config";
+import { UserModel } from "../../domain/models/user.model";
 import { AuthToken } from "../../domain/value-objects/auth-token.vo";
 import { AuthValidationService } from "../services/auth-validation.service";
-import { UserModel } from "../../domain/models/user.model";
 
 interface JwtPayload {
   sub: string;
