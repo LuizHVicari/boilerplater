@@ -88,7 +88,8 @@ pnpm run test:e2e
 - **Database**: PostgreSQL with Drizzle ORM (easily replaceable)
 - **Architecture**: Clean Architecture / Hexagonal Architecture
 - **Language**: TypeScript with strict ESLint + Prettier configuration
-- **Authentication**: JWT tokens, bcrypt password hashing, multi-tenancy support
+- **Authentication**: JWT tokens with Passport.js, bcrypt password hashing, multi-tenancy support
+- **Validation**: Joi for environment variables with strict type checking and security requirements
 - **Security**: OWASP Top 10 compliance, comprehensive security patterns
 
 ### Clean Architecture Structure
@@ -132,10 +133,18 @@ The codebase follows Clean Architecture principles with clear separation of conc
 - Uses Drizzle ORM with PostgreSQL
 - Schema files in `src/db/schema/`
 - Migrations generated in `./drizzle/` directory
-- Database URL and credentials configured via `.env`
+- Database URL and credentials configured via `.env` with Joi validation
+
+### Environment Configuration
+- **Joi Validation**: All environment variables validated at startup with strict type checking
+- **Security Requirements**: JWT secrets must be minimum 32 characters, all required variables enforced
+- **Type Safety**: Proper TypeScript types generated from validated environment variables
+- **Clear Error Messages**: Detailed validation errors with specific requirements when configuration fails
+- **No Default Values**: All required environment variables must be explicitly provided
 
 ### Code Quality Standards
 - **ESLint + Prettier**: Enforces double quotes, 100 char line limit, trailing commas
+- **Import Management**: Automatic import organization and unused import removal via eslint-plugin-simple-import-sort and eslint-plugin-unused-imports
 - **Conventional Commits**: Required format `type: description` (feat, fix, docs, etc.)
 - **Husky Pre-commit**: Runs type checking and linting before commits
 - **TypeScript**: Strict configuration with explicit return types required
@@ -277,3 +286,142 @@ This project includes specialized Claude agents (located in `.claude/agents/`) f
 - Proper separation of concerns
 
 Code comments are considered code smell and indicate unclear implementation that should be refactored instead.
+
+## Authentication Implementation Details
+
+### JWT Token Service Implementation
+The JWT token system is implemented with multiple secrets for different token types:
+
+**Token Types and Secrets**:
+- Access tokens: `JWT_ACCESS_SECRET` with configurable TTL
+- Refresh tokens: `JWT_REFRESH_SECRET` with longer TTL
+- Email verification: `JWT_EMAIL_VERIFICATION_SECRET` with 24h TTL
+- Password reset: `JWT_PASSWORD_RESET_SECRET` with 1h TTL
+
+**Token Generation** (`src/modules/users/application/adapters/jwt-token.service.ts`):
+- Uses NestJS JwtService with `signAsync()` for proper async token generation
+- Payload includes: `sub` (user ID), `email`, `type`, `iat`, `exp`, `jti`
+- Different secrets and TTLs based on token type via `getTokenSecret()` and `getTokenTTL()`
+
+**Token Verification**:
+- Extracts token type from JWT payload rather than requiring external parameter
+- Returns properly typed `AuthToken` domain object with validation
+
+### Passport JWT Strategy
+Authentication strategy located in application layer (`src/modules/users/application/strategies/jwt.strategy.ts`):
+
+**Architecture Decision**: JwtStrategy belongs in application layer because:
+- Contains business logic for token validation
+- Orchestrates multiple domain and infrastructure services
+- Not a pure infrastructure concern
+
+**Validation Flow**:
+1. Passport extracts JWT payload
+2. Create `AuthToken` domain object from payload
+3. Call `AuthValidationService` for comprehensive validation
+4. Return validated user and token for request context
+
+### Authentication Validation Service
+Centralized validation logic (`src/modules/users/application/services/auth-validation.service.ts`):
+
+**Responsibilities**:
+- Token type validation (access/refresh tokens only for authentication)
+- User existence and status verification
+- Token revocation checks via `TokenInvalidationRepository`
+- Domain rule enforcement (email confirmation, active status)
+
+**Benefits**:
+- Single source of truth for authentication validation
+- Testable business logic separated from Passport framework
+- Reusable across different authentication contexts
+
+### Module Configuration
+Complete NestJS module setup with proper dependency injection:
+
+**Required Imports**:
+- `CommonModule` for shared services (password, cache, email)
+- `ConfigModule.forFeature(jwtConfig)` for JWT configuration
+- `JwtModule.register({})` for NestJS JWT service
+- `PassportModule` for authentication strategies
+
+**Provider Registration**:
+- Repository implementations with interface tokens
+- Services with proper dependency injection
+- Strategy registration for Passport integration
+
+### Environment Variable Validation
+Comprehensive Joi schemas in configuration files:
+
+**JWT Configuration** (`src/modules/users/config/jwt.config.ts`):
+- Minimum 32-character secrets for security
+- Positive integer TTL values
+- Custom error messages for each validation rule
+- Type-safe return values with proper TypeScript types
+
+**Cache Configuration** (`src/modules/common/config/cache.config.ts`):
+- Hostname validation for cache server
+- Port validation (1-65535 range)
+- Optional password with empty string allowed
+
+**Email Configuration** (`src/modules/common/config/email.config.ts`):
+- SMTP hostname and port validation
+- Email format validation for user and sender
+- Boolean validation for secure connection flag
+
+### ESLint Import Management
+Automated code quality improvements via ESLint plugins:
+
+**eslint-plugin-simple-import-sort**:
+- Automatic import organization by type and alphabetical order
+- Separate import and export rules
+- Consistent import structure across codebase
+
+**eslint-plugin-unused-imports**:
+- Automatic removal of unused imports
+- Prevents accumulation of dead import statements
+- Improves bundle size and code clarity
+
+### Key Implementation Patterns
+
+**Domain Object Validation**:
+```typescript
+// AuthToken domain model validates token structure and business rules
+const authToken = new AuthToken(payload);
+if (!authToken.isValidForAuthentication()) {
+  throw new UnauthorizedException("Invalid token type");
+}
+```
+
+**Service Orchestration**:
+```typescript
+// Application service orchestrates domain and infrastructure concerns
+async validateAuthToken(authToken: AuthToken): Promise<UserModel> {
+  // Domain validation
+  if (!authToken.isValidForAuthentication()) { /* ... */ }
+  
+  // Infrastructure calls
+  const user = await this.userQueryRepo.findUserById(authToken.sub);
+  await this.tokenInvalidationRepo.verifyTokenValid(authToken);
+  
+  // Domain business rules
+  if (!user?.canAuthenticate()) { /* ... */ }
+  
+  return user;
+}
+```
+
+**Configuration Validation Pattern**:
+```typescript
+// Joi schema validation with custom error messages
+const schema = Joi.object({
+  accessSecret: Joi.string().min(32).required().messages({
+    "string.min": "JWT_ACCESS_SECRET must be at least 32 characters long",
+    "any.required": "JWT_ACCESS_SECRET is required",
+  }),
+});
+
+const result = schema.validate(values, { convert: true, abortEarly: false });
+if (result.error) {
+  throw new Error(`Configuration validation failed: ${result.error.details.map(d => d.message).join(", ")}`);
+}
+```

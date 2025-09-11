@@ -26,7 +26,7 @@ A comprehensive **authentication/authorization microservice template** built wit
 - **Protocols**: GraphQL (Apollo Server), REST, gRPC, AMQP
 - **Database**: PostgreSQL with Drizzle ORM (easily replaceable)
 - **Authentication**: JWT tokens, bcrypt password hashing
-- **Validation**: Class Validator & Transformer
+- **Validation**: Joi for environment variables, Class Validator & Transformer for DTOs
 - **Testing**: Jest with structured testing workflow
 - **Code Quality**: ESLint, Prettier, Husky, Conventional Commits
 - **Development**: Docker, Hot Reload, Specialized Claude Agents
@@ -255,7 +255,25 @@ pnpm run test:e2e
 
 ## Environment Variables
 
-Configure your environment by creating a `.env` file. The application requires database connection settings and other configuration variables. See the existing `.env` file for the current required variables and their format.
+Configure your environment by creating a `.env` file from the template:
+
+```bash
+cp .env.example .env
+```
+
+The application uses **Joi validation** to ensure all environment variables are properly configured with strict validation rules:
+
+### Validation Features
+
+- **Database Configuration**: Hostname and port validation for PostgreSQL connection
+- **Cache Configuration**: Redis hostname and port validation with optional password
+- **JWT Security**: All secrets must be minimum 32 characters, TTL values must be positive integers
+- **Email Configuration**: SMTP hostname, port, and email format validation
+- **Strict Type Checking**: All variables validated for correct data types and formats
+- **Clear Error Messages**: Detailed validation errors with specific requirements
+- **Startup Validation**: Application fails fast if any required variable is missing or invalid
+
+See `.env.example` for all required variables and their expected formats. If validation fails, the application will throw detailed error messages indicating which variables need attention.
 
 ## Deployment
 
