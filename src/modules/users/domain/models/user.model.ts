@@ -79,6 +79,10 @@ export class UserModel {
     return this._emailConfirmed;
   }
 
+  canAuthenticate(): boolean {
+    return this.active && this.emailConfirmed;
+  }
+
   deactivate(): void {
     this._active = false;
     this._updatedAt = new Date();

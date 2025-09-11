@@ -1,22 +1,20 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Inject } from "@nestjs/common";
 import { TokenInvalidationRepository } from "../ports/token-invalidation-repo.service";
-import { type CacheService } from "src/modules/common/application/ports/cache.service";
 import {
-  ONE_DAY_SECONDS,
-  TWO_WEEKS_SECONDS,
-  ONE_HOUR_SECONDS,
-} from "src/shared/constants/time-units.constants";
+  CACHE_SERVICE,
+  type CacheService,
+} from "src/modules/common/application/ports/cache.service";
 import { AuthToken } from "src/modules/users/domain/value-objects/auth-token.vo";
 import { millisecondsToSeconds } from "src/shared/utils/time";
-
-const EMAIL_VERIFICATION_TOKEN_TTL_SECONDS = ONE_DAY_SECONDS;
-const RESET_PASSWORD_TOKEN_TTL_SECONDS = ONE_DAY_SECONDS;
-const REFRESH_TOKEN_TTL_SECONDS = TWO_WEEKS_SECONDS;
-const ACCESS_TOKEN_TTL_SECONDS = ONE_HOUR_SECONDS;
+import jwtConfig from "../../config/jwt.config";
+import { type ConfigType } from "@nestjs/config";
 
 @Injectable()
 export class CacheTokenInvalidationRepoService implements TokenInvalidationRepository {
-  constructor(private readonly cacheService: CacheService) {}
+  constructor(
+    @Inject(CACHE_SERVICE) private readonly cacheService: CacheService,
+    @Inject(jwtConfig.KEY) private readonly jwtSettings: ConfigType<typeof jwtConfig>,
+  ) {}
   async verifyTokenValid(token: AuthToken): Promise<boolean> {
     const [jtiInvalidation, typeInvalidation, allInvalidation] = await Promise.all([
       this.cacheService.get(this.buildSingleTokenInvalidationKey(token)),
@@ -62,17 +60,17 @@ export class CacheTokenInvalidationRepoService implements TokenInvalidationRepos
 
   private getTokenInvalidationTtl(type?: AuthToken["type"]): number {
     if (type === "access") {
-      return ACCESS_TOKEN_TTL_SECONDS;
+      return this.jwtSettings.accessTokenTtl;
     }
     if (type === "refresh") {
-      return REFRESH_TOKEN_TTL_SECONDS;
+      return this.jwtSettings.refreshTokenTtl;
     }
     if (type === "email-confirmation") {
-      return EMAIL_VERIFICATION_TOKEN_TTL_SECONDS;
+      return this.jwtSettings.emailVerificationTokenTtl;
     }
     if (type === "password-recovery") {
-      return RESET_PASSWORD_TOKEN_TTL_SECONDS;
+      return this.jwtSettings.passwordResetTokenTtl;
     }
-    return TWO_WEEKS_SECONDS;
+    return this.jwtSettings.refreshTokenTtl;
   }
 }

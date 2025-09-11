@@ -1,3 +1,5 @@
+import { secondsToMilliseconds } from "src/shared/utils/time";
+
 interface Props {
   sub: string;
   iat: number;
@@ -19,5 +21,13 @@ export class AuthToken {
     this.exp = props.exp;
     this.jti = props.jti;
     this.type = props.type;
+  }
+
+  isValidForAuthentication(): boolean {
+    return this.type === "access";
+  }
+
+  isExpired(): boolean {
+    return Date.now() > secondsToMilliseconds(this.exp);
   }
 }

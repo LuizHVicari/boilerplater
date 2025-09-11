@@ -27,9 +27,21 @@ services:
     volumes:
       - valkey_data:/data
 
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: boilerplater-redisinsight
+    restart: unless-stopped
+    ports:
+      - "${REDISINSIGHT_PORT:-5540}:5540"
+    networks:
+      - boilerplater-network
+    volumes:
+      - redisinsight_data:/data
+
 volumes:
   postgres_data:
   valkey_data:
+  redisinsight_data:
 
 networks:
   boilerplater-network:
