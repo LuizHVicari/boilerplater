@@ -15,6 +15,13 @@
       "when": 1757469835603,
       "tag": "0001_nosy_gressill",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1757899387877,
+      "tag": "0002_gigantic_nehzno",
+      "breakpoints": true
     }
   ]
 }

@@ -21,25 +21,27 @@ import emailConfig from "./config/email.config";
     MailerModule.forRootAsync({
       imports: [ConfigModule.forFeature(emailConfig)],
       inject: [emailConfig.KEY],
-      useFactory: (config: ConfigType<typeof emailConfig>) => ({
-        transport: {
-          host: config.host,
-          port: config.port,
-          secure: config.secure,
-          auth: {
-            user: config.user,
-            pass: config.password,
+      useFactory: (config: ConfigType<typeof emailConfig>) => {
+        return {
+          transport: {
+            host: config.host,
+            port: config.port,
+            secure: config.secure,
+            auth: {
+              user: config.user,
+              pass: config.password,
+            },
           },
-        },
-        defaults: {
-          from: config.sender,
-        },
-        template: {
-          dir: `${process.cwd()}/modules/common/templates`,
-          adapter: new HandlebarsAdapter(),
-          options: { strict: true },
-        },
-      }),
+          defaults: {
+            from: config.sender,
+          },
+          template: {
+            dir: `${process.cwd()}/src/modules/common/templates`,
+            adapter: new HandlebarsAdapter(),
+            options: { strict: true },
+          },
+        };
+      },
     }),
   ],
   providers: [

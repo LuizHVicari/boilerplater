@@ -3,6 +3,8 @@
     "boilerplater",
     "eslintcache",
     "impls",
+    "Interactor",
+    "interactors",
     "redisinsight",
     "uuidv4",
     "uuidv7",

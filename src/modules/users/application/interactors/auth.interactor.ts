@@ -9,24 +9,21 @@ import {
 } from "src/modules/common/application/ports/unit-of-work.service";
 import { UserModel } from "src/modules/users/domain/models/user.model";
 
-import { PASSWORD_SERVICE, type PasswordService } from "../../ports/password.service";
-import { TOKEN_SERVICE, type TokenService } from "../../ports/token.service";
+import { PASSWORD_SERVICE, type PasswordService } from "../ports/password.service";
+import { TOKEN_SERVICE, type TokenService } from "../ports/token.service";
 import {
   TOKEN_INVALIDATION_REPOSITORY,
   type TokenInvalidationRepository,
-} from "../../ports/token-invalidation-repo.service";
-import {
-  USER_QUERY_REPOSITORY,
-  type UserQueryRepository,
-} from "../../ports/user-query-repo.service";
+} from "../ports/token-invalidation-repo.service";
+import { USER_QUERY_REPOSITORY, type UserQueryRepository } from "../ports/user-query-repo.service";
 import {
   type SignUpUseCase,
   type SignUpUseCaseCommand,
   type SignUpUseCaseResponse,
-} from "../auth.use-cases";
+} from "../use-cases/auth.use-cases";
 
 @Injectable()
-export class AuthUseCasesImpl implements SignUpUseCase {
+export class AuthInteractor implements SignUpUseCase {
   constructor(
     @Inject(EMAIL_SERVICE)
     private readonly emailService: EmailService,

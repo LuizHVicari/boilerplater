@@ -1,16 +1,22 @@
+import { Inject, Injectable } from "@nestjs/common";
 import { and, count, eq, gte, like, lte, or, SQL } from "drizzle-orm";
+import { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { AnyPgColumn } from "drizzle-orm/pg-core";
-import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
+import { DB_TOKEN } from "src/db";
 import { usersTable } from "src/db/schema";
 import { UserModel } from "src/modules/users/domain/models/user.model";
 
 import { ListUserProps, UserQueryRepository } from "../ports/user-query-repo.service";
 import { UserModelSchemaMapper } from "./user-model-schema-mapper";
 
+@Injectable()
 export class UserQueryDrizzleRepository implements UserQueryRepository {
   private readonly mapper = new UserModelSchemaMapper();
 
-  constructor(private readonly db: PostgresJsDatabase) {}
+  constructor(
+    @Inject(DB_TOKEN)
+    private readonly db: NodePgDatabase,
+  ) {}
 
   async findUserById(userId: string): Promise<UserModel | undefined> {
     const [result] = await this.db.select().from(usersTable).where(eq(usersTable.id, userId));
