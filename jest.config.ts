@@ -13,6 +13,9 @@ const config: Config = {
   coverageDirectory: '../coverage',
   moduleNameMapper: {
     '^src/(.*)$': '<rootDir>/$1',
+    '^@common/(.*)$': '<rootDir>/modules/common/$1',
+    '^@users/(.*)$': '<rootDir>/modules/users/$1',
+    '^@shared/(.*)$': '<rootDir>/shared/$1',
   },
   forceExit: true,
   detectOpenHandles: true,

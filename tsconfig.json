@@ -22,7 +22,10 @@
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "src/*": ["src/*"]
+      "src/*": ["src/*"],
+      "@common/*": ["src/modules/common/*"],
+      "@users/*": ["src/modules/users/*"],
+      "@shared/*": ["src/shared/*"]
     }
   }
 }

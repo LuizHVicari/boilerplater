@@ -1,29 +1,23 @@
-import { Inject, Injectable } from "@nestjs/common";
-import {
-  EMAIL_SERVICE,
-  type EmailService,
-} from "src/modules/common/application/ports/email.service";
-import {
-  UNIT_OF_WORK,
-  type UnitOfWork,
-} from "src/modules/common/application/ports/unit-of-work.service";
-import { UserModel } from "src/modules/users/domain/models/user.model";
+import { EMAIL_SERVICE, type EmailService } from "@common/application/ports/email.service";
+import { UNIT_OF_WORK, type UnitOfWork } from "@common/application/ports/unit-of-work.service";
+import { Inject } from "@nestjs/common";
+import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
+import { UserModel } from "@users/domain/models/user.model";
 
-import { PASSWORD_SERVICE, type PasswordService } from "../ports/password.service";
-import { TOKEN_SERVICE, type TokenService } from "../ports/token.service";
+import { PASSWORD_SERVICE, type PasswordService } from "../../ports/password.service";
+import { TOKEN_SERVICE, type TokenService } from "../../ports/token.service";
 import {
   TOKEN_INVALIDATION_REPOSITORY,
   type TokenInvalidationRepository,
-} from "../ports/token-invalidation-repo.service";
-import { USER_QUERY_REPOSITORY, type UserQueryRepository } from "../ports/user-query-repo.service";
+} from "../../ports/token-invalidation-repo.service";
 import {
-  type SignUpUseCase,
-  type SignUpUseCaseCommand,
-  type SignUpUseCaseResponse,
-} from "../use-cases/auth.use-cases";
+  USER_QUERY_REPOSITORY,
+  type UserQueryRepository,
+} from "../../ports/user-query-repo.service";
+import { SignUpCommand, SignUpCommandResponse } from "../sign-up.command";
 
-@Injectable()
-export class AuthInteractor implements SignUpUseCase {
+@CommandHandler(SignUpCommand)
+export class SignUpHandler implements ICommandHandler<SignUpCommand> {
   constructor(
     @Inject(EMAIL_SERVICE)
     private readonly emailService: EmailService,
@@ -39,12 +33,12 @@ export class AuthInteractor implements SignUpUseCase {
     private readonly passwordService: PasswordService,
   ) {}
 
-  async signUp({
+  async execute({
     email,
     password,
     firstName,
     lastName,
-  }: SignUpUseCaseCommand): Promise<SignUpUseCaseResponse> {
+  }: SignUpCommand): Promise<SignUpCommandResponse> {
     return this.unitOfWork.execute(async ctx => {
       const hashedPasswordPromise = this.passwordService.hashPassword(password);
       const existingUserPromise = this.userQueryRepo.findUserByEmail(email);
@@ -68,6 +62,9 @@ export class AuthInteractor implements SignUpUseCase {
       });
 
       const createdUser = await ctx.userCommandRepository.createUser(user);
+
+      await this.tokenInvalidationRepo.invalidateAllUserTokens(user.id, "email-confirmation");
+
       const token = await this.tokenService.generateToken(user, "email-confirmation");
       await this.emailService.sendEmail({
         email,
