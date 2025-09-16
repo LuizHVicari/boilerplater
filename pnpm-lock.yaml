@@ -81,9 +81,15 @@ importers:
         specifier: ^7.8.1
         version: 7.8.2
       uuid:
-        specifier: ^13.0.0
-        version: 13.0.0
+        specifier: ^11.1.0
+        version: 11.1.0
     devDependencies:
+      '@automock/adapters.nestjs':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@automock/jest':
+        specifier: ^2.1.0
+        version: 2.1.0(jest@30.1.3(@types/node@22.18.1)(esbuild-register@3.6.0(esbuild@0.25.9))(ts-node@10.9.2(@swc/core@1.13.5)(@types/node@22.18.1)(typescript@5.9.2)))
       '@commitlint/cli':
         specifier: ^19.8.1
         version: 19.8.1(@types/node@22.18.1)(typescript@5.9.2)
@@ -105,6 +111,15 @@ importers:
       '@nestjs/testing':
         specifier: ^11.0.1
         version: 11.1.6(@nestjs/common@11.1.6(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.6)(@nestjs/platform-express@11.1.6)
+      '@suites/di.nestjs':
+        specifier: ^3.0.1
+        version: 3.0.1(@nestjs/common@11.1.6(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.2))(reflect-metadata@0.2.2)
+      '@suites/doubles.jest':
+        specifier: ^3.0.1
+        version: 3.0.1(jest@30.1.3(@types/node@22.18.1)(esbuild-register@3.6.0(esbuild@0.25.9))(ts-node@10.9.2(@swc/core@1.13.5)(@types/node@22.18.1)(typescript@5.9.2)))
+      '@suites/unit':
+        specifier: ^3.0.1
+        version: 3.0.1
       '@swc/cli':
         specifier: ^0.7.8
         version: 0.7.8(@swc/core@1.13.5)(chokidar@4.0.3)
@@ -307,6 +322,27 @@ packages:
 
   '@apollographql/graphql-playground-html@1.6.29':
     resolution: {integrity: sha512-xCcXpoz52rI4ksJSdOCxeOCn2DLocxwHf9dVT/Q90Pte1LX+LY+91SFtJF3KXVHH8kEin+g1KKCQPKBjZJfWNA==}
+
+  '@automock/adapters.nestjs@2.1.0':
+    resolution: {integrity: sha512-cwolpTMF+frIm6idLC/zD0obgG/Wf5wP6I8FKJBcRy+Cuc9Pyy/E7200zafYlOVzUlZUP16VqchgGWpUyb1U3Q==}
+    engines: {node: ^16.10.0 || ^18.12.0 || >=20.0.0}
+
+  '@automock/common@3.1.0':
+    resolution: {integrity: sha512-Y7N4YnSZRuSIfGV4/PdG2JyURa9PK1maqGZBYUG2/sIW+H/Mlhc/3NpegnlUyQFRBexEJtgmUsvfzzI1/lm0JA==}
+    engines: {node: ^16.10.0 || ^18.12.0 || >=20.0.0}
+
+  '@automock/core@2.1.0':
+    resolution: {integrity: sha512-VIaY2woE7nWXhXKlNzk4+xzCuaVBXfGYwowrzdI+MmJBKqi2z0lUjNVix74hZRWhJpkOW+PR3UThFvThgyqIqQ==}
+    engines: {node: ^16.10.0 || ^18.12.0 || >=20.0.0}
+
+  '@automock/jest@2.1.0':
+    resolution: {integrity: sha512-kJuTu/a5bbG8SICIfITgESpIrVbBfbMykDdICmPvJkeI51Ldq+tqiLS2Ded16vLWS9WeFKeTw/+2b/DO8QyV0Q==}
+    engines: {node: ^16.10.0 || ^18.12.0 || >=20.0.0}
+    peerDependencies:
+      jest: ^26 || ^27 || ^28 || ^29
+
+  '@automock/types@2.0.1':
+    resolution: {integrity: sha512-ue35e4im3n7l+Eqq3kCA2nNs8jzJbjYLni+vlPdgJ+9KfsEykJjA1OpnNN/PG1tDaM0iyR2p/uZg27MOC/qiTg==}
 
   '@aws-crypto/sha256-browser@5.2.0':
     resolution: {integrity: sha512-AXfN/lGotSQwu6HNcEsIASo7kWXZ5HYWvfOmSNKDsEqC4OashTp8alTmaz+F7TC2L083SFv5RdB+qU3Vs1kZqw==}
@@ -1941,6 +1977,38 @@ packages:
 
   '@standard-schema/spec@1.0.0':
     resolution: {integrity: sha512-m2bOd0f2RT9k8QJx1JN85cZYyH1RqFBdlwtkSlf4tBDYLCiiZnv1fIIwacK6cqwXavOydf0NPToMQgpKq+dVlA==}
+
+  '@suites/core.unit@3.0.1':
+    resolution: {integrity: sha512-X5xNg5EK1zAKXo4WS1fyBcViyvWvUWCEaA1fv/3ow5mD9AkKnIQajqm9pLAkUl/BM73baLQv9biLnmEHje1ghA==}
+    engines: {node: ^16.10.0 || ^18.12.0 || >=20.0.0}
+
+  '@suites/di.nestjs@3.0.1':
+    resolution: {integrity: sha512-mcXq9GgaE1hC/5Qu69tJZrhSE7dcWJAWHzRvnRyx6UV9XP2Ze6aRK4/uCkviG84A1il4QLNQy+NvhOf0LooDgA==}
+    engines: {node: ^16.10.0 || ^18.12.0 || >=20.0.0}
+    peerDependencies:
+      '@nestjs/common': '>= 8.0'
+      reflect-metadata: <1.0.0
+
+  '@suites/doubles.jest@3.0.1':
+    resolution: {integrity: sha512-ioGi5QP2kSa0bAehz1NA0kXfyKUfjRuKQV7SP0YnXHO2j9X712xDOqF4cGrLU74A6HYFWjbyK/NLJOUpCz1yLw==}
+    engines: {node: ^16.10.0 || ^18.12.0 || >=20.0.0}
+    peerDependencies:
+      jest: '> 26.0'
+
+  '@suites/types.common@3.0.0':
+    resolution: {integrity: sha512-+kCWmVAyEI01P4d/t3LbrOCq1xXQlh3SsPstn1uBuC/MDMW/pENHkU5xVC9G8VOW/pkXh53KXwbHIxpJImp4Zw==}
+    engines: {node: ^16.10.0 || ^18.12.0 || >=20.0.0}
+
+  '@suites/types.di@3.0.0':
+    resolution: {integrity: sha512-RzvgfTsjg3KrJ3SRbo9J84g5mRfkMZMzinLTjAQO+yCBBz+YMhbwaUXDBX70RcFGiAHjTNPg0jWjis3FHPH8Dg==}
+    engines: {node: ^16.10.0 || ^18.12.0 || >=20.0.0}
+
+  '@suites/types.doubles@3.0.0':
+    resolution: {integrity: sha512-B5sHH98qU7Fq+ozA42J3LLv846xRJn2ndx1xfLr0oaKxEG6Xud/vmdJpH65F/2P7DNMJkxWo/VDIqXrN4UDcvg==}
+
+  '@suites/unit@3.0.1':
+    resolution: {integrity: sha512-28RLtgxG8NH6zcBvfiMGqbToWNTs2WnTPa9GWQ2k1laXueGILDTTRjQrsApIAlbtRF5lGuGPynRFEMBAL+90Mw==}
+    engines: {node: ^16.10.0 || ^18.12.0 || >=20.0.0}
 
   '@swc/cli@0.7.8':
     resolution: {integrity: sha512-27Ov4rm0s2C6LLX+NDXfDVB69LGs8K94sXtFhgeUyQ4DBywZuCgTBu2loCNHRr8JhT9DeQvJM5j9FAu/THbo4w==}
@@ -4393,6 +4461,10 @@ packages:
   lodash.isboolean@3.0.3:
     resolution: {integrity: sha512-Bz5mupy2SVbPHURB98VAcw+aHh4vRV5IPNhILUCsOzRmsTmSQ17jIuqopAentWoehktxGd9e/hbIXq980/1QJg==}
 
+  lodash.isequal@4.5.0:
+    resolution: {integrity: sha512-pDo3lu8Jhfjqls6GkMgpahsF9kCyayhgykjyLMNFTKWrpVdAQtYyB4muAMWozBB4ig/dtWAmsMxLEI8wuz+DYQ==}
+    deprecated: This package is deprecated. Use require('node:util').isDeepStrictEqual instead.
+
   lodash.isinteger@4.0.4:
     resolution: {integrity: sha512-DBwtEWN2caHQ9/imiNeEA5ys1JoRtRfY3d7V9wkqtbycnAmTvRRmbHKDV4a0EYc678/dia0jrte4tjYwVBaZUA==}
 
@@ -5192,6 +5264,9 @@ packages:
     resolution: {integrity: sha512-DJnGAeenTdpMEH6uAJRK/uiyEIH9WVsUmoLwzudwGJUwZPp80PDBWPHXSAGNPwNvIXAbe7MSUB1zQFugFml66A==}
     engines: {node: '>=4'}
 
+  reflect-metadata@0.1.14:
+    resolution: {integrity: sha512-ZhYeb6nRaXCfhnndflDK8qI6ZQ/YcWZCISRAWICW9XYqMUwjZM9Z0DveWX/ABN01oxSHwVxKQmxeYZSsm0jh5A==}
+
   reflect-metadata@0.2.2:
     resolution: {integrity: sha512-urBwgfrvVP/eAyXx4hluJivBKzuEbSQs9rKWCrCkbSxNv8mxPcUZKeuoF3Uy4mJl3Lwprp6yy5/39VWigZ4K6Q==}
 
@@ -5792,8 +5867,8 @@ packages:
     resolution: {integrity: sha512-pMZTvIkT1d+TFGvDOqodOclx0QWkkgi6Tdoa8gC8ffGAAqz9pzPTZWAybbsHHoED/ztMtkv/VoYTYyShUn81hA==}
     engines: {node: '>= 0.4.0'}
 
-  uuid@13.0.0:
-    resolution: {integrity: sha512-XQegIaBTVUjSHliKqcnFqYypAd4S+WCYt5NIeRs6w/UAry7z8Y9j5ZwRRL4kzq9U3sD6v+85er9FvkEaBpji2w==}
+  uuid@11.1.0:
+    resolution: {integrity: sha512-0/A9rDy9P7cJ+8w1c9WD9V//9Wj15Ce2MPz8Ri6032usz+NfePxx5AcN3bN+r6ZL6jEo066/yNYB3tn4pQEx+A==}
     hasBin: true
 
   uuid@9.0.1:
@@ -6134,6 +6209,30 @@ snapshots:
   '@apollographql/graphql-playground-html@1.6.29':
     dependencies:
       xss: 1.0.15
+
+  '@automock/adapters.nestjs@2.1.0':
+    dependencies:
+      '@automock/common': 3.1.0
+      '@automock/types': 2.0.1
+      reflect-metadata: 0.1.14
+
+  '@automock/common@3.1.0':
+    dependencies:
+      '@automock/types': 2.0.1
+
+  '@automock/core@2.1.0':
+    dependencies:
+      '@automock/common': 3.1.0
+      '@automock/types': 2.0.1
+      lodash.isequal: 4.5.0
+
+  '@automock/jest@2.1.0(jest@30.1.3(@types/node@22.18.1)(esbuild-register@3.6.0(esbuild@0.25.9))(ts-node@10.9.2(@swc/core@1.13.5)(@types/node@22.18.1)(typescript@5.9.2)))':
+    dependencies:
+      '@automock/core': 2.1.0
+      '@automock/types': 2.0.1
+      jest: 30.1.3(@types/node@22.18.1)(esbuild-register@3.6.0(esbuild@0.25.9))(ts-node@10.9.2(@swc/core@1.13.5)(@types/node@22.18.1)(typescript@5.9.2))
+
+  '@automock/types@2.0.1': {}
 
   '@aws-crypto/sha256-browser@5.2.0':
     dependencies:
@@ -8149,6 +8248,41 @@ snapshots:
       tslib: 2.8.1
 
   '@standard-schema/spec@1.0.0': {}
+
+  '@suites/core.unit@3.0.1':
+    dependencies:
+      '@suites/types.common': 3.0.0
+      '@suites/types.di': 3.0.0
+      lodash.isequal: 4.5.0
+
+  '@suites/di.nestjs@3.0.1(@nestjs/common@11.1.6(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.2))(reflect-metadata@0.2.2)':
+    dependencies:
+      '@nestjs/common': 11.1.6(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@suites/types.common': 3.0.0
+      '@suites/types.di': 3.0.0
+      reflect-metadata: 0.2.2
+
+  '@suites/doubles.jest@3.0.1(jest@30.1.3(@types/node@22.18.1)(esbuild-register@3.6.0(esbuild@0.25.9))(ts-node@10.9.2(@swc/core@1.13.5)(@types/node@22.18.1)(typescript@5.9.2)))':
+    dependencies:
+      '@suites/core.unit': 3.0.1
+      '@suites/types.common': 3.0.0
+      '@suites/types.doubles': 3.0.0
+      jest: 30.1.3(@types/node@22.18.1)(esbuild-register@3.6.0(esbuild@0.25.9))(ts-node@10.9.2(@swc/core@1.13.5)(@types/node@22.18.1)(typescript@5.9.2))
+
+  '@suites/types.common@3.0.0': {}
+
+  '@suites/types.di@3.0.0':
+    dependencies:
+      '@suites/types.common': 3.0.0
+
+  '@suites/types.doubles@3.0.0': {}
+
+  '@suites/unit@3.0.1':
+    dependencies:
+      '@suites/core.unit': 3.0.1
+      '@suites/types.common': 3.0.0
+      '@suites/types.di': 3.0.0
+      '@suites/types.doubles': 3.0.0
 
   '@swc/cli@0.7.8(@swc/core@1.13.5)(chokidar@4.0.3)':
     dependencies:
@@ -11028,6 +11162,8 @@ snapshots:
 
   lodash.isboolean@3.0.3: {}
 
+  lodash.isequal@4.5.0: {}
+
   lodash.isinteger@4.0.4: {}
 
   lodash.isnumber@3.0.3: {}
@@ -12043,6 +12179,8 @@ snapshots:
     dependencies:
       redis-errors: 1.2.0
 
+  reflect-metadata@0.1.14: {}
+
   reflect-metadata@0.2.2: {}
 
   relateurl@0.2.7:
@@ -12694,7 +12832,7 @@ snapshots:
 
   utils-merge@1.0.1: {}
 
-  uuid@13.0.0: {}
+  uuid@11.1.0: {}
 
   uuid@9.0.1: {}
 

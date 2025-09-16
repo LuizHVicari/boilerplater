@@ -3,7 +3,6 @@ import { ConfigModule } from "@nestjs/config";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
 
-import { AuthResolver } from "../presentation/graphql/resolvers/auth.resolver";
 import { BcryptPasswordService } from "./application/adapters/bcrypt-password.service";
 import { CacheTokenInvalidationRepoService } from "./application/adapters/cache-token-invalidation-repo.service";
 import { JWTTokenService } from "./application/adapters/jwt-token.service";
@@ -17,6 +16,7 @@ import { AuthValidationService } from "./application/services/auth-validation.se
 import { JwtStrategy } from "./application/strategies/jwt.strategy";
 import { SIGN_UP_USE_CASE } from "./application/use-cases/auth.use-cases";
 import jwtConfig from "./config/jwt.config";
+import { AuthResolver } from "./presentation/graphql/resolvers/auth.resolver";
 
 @Module({
   imports: [ConfigModule.forFeature(jwtConfig), JwtModule.register({}), PassportModule],
