@@ -1,10 +1,15 @@
 import { CommandBus } from "@nestjs/cqrs";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { ConfirmEmailCommand } from "@users/application/commands/confirm-email.command";
+import { ResendEmailConfirmationCommand } from "@users/application/commands/resend-email-confirmation.command";
 import { SignUpCommand } from "@users/application/commands/sign-up.command";
 
-import { ConfirmEmailResponse, SignUpResponse } from "../dto/auth.responses";
-import { ConfirmEmailInput, SignUpInput } from "../dto/sign-up.input";
+import { ConfirmEmailInput, ResendEmailConfirmationInput, SignUpInput } from "../dto/auth.input";
+import {
+  ConfirmEmailResponse,
+  ResendEmailConfirmationResponse,
+  SignUpResponse,
+} from "../dto/auth.responses";
 
 @Resolver()
 export class AuthResolver {
@@ -37,6 +42,19 @@ export class AuthResolver {
 
     return {
       id,
+      email,
+    };
+  }
+
+  @Mutation(() => ResendEmailConfirmationResponse)
+  async resendEmailConfirmation(
+    @Args("input") input: ResendEmailConfirmationInput,
+  ): Promise<ResendEmailConfirmationResponse> {
+    const { email } = await this.commandBus.execute(
+      new ResendEmailConfirmationCommand(input.email),
+    );
+
+    return {
       email,
     };
   }

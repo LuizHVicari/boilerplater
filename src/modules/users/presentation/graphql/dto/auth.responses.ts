@@ -29,3 +29,9 @@ export class ConfirmEmailResponse {
   @Field()
   email: string;
 }
+
+@ObjectType()
+export class ResendEmailConfirmationResponse {
+  @Field()
+  email: string;
+}

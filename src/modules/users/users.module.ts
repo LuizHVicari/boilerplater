@@ -8,6 +8,7 @@ import { CacheTokenInvalidationRepoService } from "./application/adapters/cache-
 import { JWTTokenService } from "./application/adapters/jwt-token.service";
 import { UserQueryDrizzleRepository } from "./application/adapters/user-query-drizzle-repo.service";
 import { ConfirmEmailHandler } from "./application/commands/handlers/confirm-email.handler";
+import { ResendEmailConfirmationHandler } from "./application/commands/handlers/resend-email-confirmation.handler";
 import { SignUpHandler } from "./application/commands/handlers/sign-up.handler";
 import { PASSWORD_SERVICE } from "./application/ports/password.service";
 import { TOKEN_SERVICE } from "./application/ports/token.service";
@@ -30,6 +31,7 @@ import { AuthResolver } from "./presentation/graphql/resolvers/auth.resolver";
     AuthResolver,
     SignUpHandler,
     ConfirmEmailHandler,
+    ResendEmailConfirmationHandler,
   ],
 })
 export class UsersModule {}

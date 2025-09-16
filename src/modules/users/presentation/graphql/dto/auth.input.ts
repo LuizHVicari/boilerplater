@@ -29,3 +29,11 @@ export class ConfirmEmailInput {
   @IsNotEmpty()
   token: string;
 }
+
+@InputType()
+export class ResendEmailConfirmationInput {
+  @Field()
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+}
