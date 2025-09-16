@@ -20,3 +20,12 @@ export class SignUpResponse {
   @Field()
   updatedAt: Date;
 }
+
+@ObjectType()
+export class ConfirmEmailResponse {
+  @Field()
+  id: string;
+
+  @Field()
+  email: string;
+}

@@ -1,9 +1,10 @@
 import { CommandBus } from "@nestjs/cqrs";
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
+import { ConfirmEmailCommand } from "@users/application/commands/confirm-email.command";
 import { SignUpCommand } from "@users/application/commands/sign-up.command";
 
-import { SignUpResponse } from "../dto/auth.responses";
-import { SignUpInput } from "../dto/sign-up.input";
+import { ConfirmEmailResponse, SignUpResponse } from "../dto/auth.responses";
+import { ConfirmEmailInput, SignUpInput } from "../dto/sign-up.input";
 
 @Resolver()
 export class AuthResolver {
@@ -27,6 +28,16 @@ export class AuthResolver {
       lastName,
       createdAt,
       updatedAt,
+    };
+  }
+
+  @Mutation(() => ConfirmEmailResponse)
+  async confirmEmail(@Args("input") input: ConfirmEmailInput): Promise<ConfirmEmailResponse> {
+    const { id, email } = await this.commandBus.execute(new ConfirmEmailCommand(input.token));
+
+    return {
+      id,
+      email,
     };
   }
 }
