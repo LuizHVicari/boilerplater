@@ -425,3 +425,161 @@ if (result.error) {
   throw new Error(`Configuration validation failed: ${result.error.details.map(d => d.message).join(", ")}`);
 }
 ```
+
+## CQRS Implementation
+
+### Command Query Responsibility Segregation (CQRS)
+The project implements CQRS pattern using NestJS CQRS package for clear separation of read and write operations:
+
+**Global CQRS Configuration** (`src/app.module.ts`):
+- `CqrsModule.forRoot()` registered globally for command/query bus access
+- Enables dependency injection of CommandBus and QueryBus across modules
+
+**Command Structure**:
+- Commands extend base Command class with typed response
+- Command handlers implement `ICommandHandler<TCommand>`
+- Clear separation between command data and business logic
+- Example: `SignUpCommand`, `ConfirmEmailCommand`, `ResendEmailConfirmationCommand`
+
+**Command Handler Pattern**:
+```typescript
+@CommandHandler(SignUpCommand)
+export class SignUpHandler implements ICommandHandler<SignUpCommand> {
+  async execute(command: SignUpCommand): Promise<SignUpCommandResponse> {
+    // Business logic implementation
+    return response;
+  }
+}
+```
+
+**GraphQL Integration**:
+- Resolvers use CommandBus to execute commands
+- Explicit mapping between Command responses and GraphQL DTOs
+- Separation of concerns maintained between layers
+
+```typescript
+@Mutation(() => SignUpResponse)
+async signUp(@Args("input") input: SignUpInput): Promise<SignUpResponse> {
+  const { id, email, firstName, lastName, createdAt, updatedAt } =
+    await this.commandBus.execute(new SignUpCommand(input.email, input.password, input.firstName, input.lastName));
+
+  return { id, email, firstName, lastName, createdAt, updatedAt };
+}
+```
+
+## Domain Error Hierarchy
+
+### Framework-Agnostic Error Handling
+Implemented comprehensive domain error system that's independent of NestJS for protocol flexibility:
+
+**Base Error Structure** (`src/shared/errors/`):
+- `DomainError` abstract base class extending Error
+- Generic error types: `EntityNotFoundError`, `ValidationError`, `InvalidTokenError`
+- HTTP status constants to avoid magic numbers
+- Domain-specific errors inherit from generic types
+
+**User Domain Errors** (`src/modules/users/domain/errors/`):
+- `UserNotFoundError extends EntityNotFoundError`
+- `UserAlreadyExistsError extends EntityAlreadyExistsError`
+- `EmailAlreadyConfirmedError extends AlreadyProcessedError`
+
+**Exception Filter Integration**:
+```typescript
+@Catch(DomainError)
+export class DomainErrorFilter implements ExceptionFilter, GqlExceptionFilter {
+  catch(exception: DomainError, host: ArgumentsHost): void | DomainError {
+    const contextType = host.getType<"http" | "graphql">();
+
+    if (contextType === "graphql") {
+      return this.handleGraphQLError(exception);
+    }
+
+    return this.handleHttpError(exception, host);
+  }
+}
+```
+
+**Benefits**:
+- Protocol-agnostic error handling (HTTP, GraphQL, gRPC, AMQP)
+- Consistent error responses across all communication layers
+- Type-safe error handling with proper HTTP status codes
+- Clean separation from framework dependencies
+
+### Error Replacement Strategy
+All generic `throw new Error()` calls replaced with typed domain errors:
+- Command handlers use specific domain errors
+- Infrastructure adapters use appropriate error types
+- Domain models validate using `ValidationError`
+- Token services use `InvalidTokenError` for type safety
+
+## Authentication Flow Implementation
+
+### Multi-Step Authentication Process
+Complete implementation of secure authentication flows:
+
+**SignUp Flow**:
+1. Password hashing validation and user creation
+2. Token invalidation for security (previous email-confirmation tokens)
+3. New email confirmation token generation
+4. Welcome email dispatch with verification link
+5. Transactional consistency via UnitOfWork pattern
+
+**Email Confirmation Flow**:
+1. JWT token verification and type validation
+2. Token invalidation status checking
+3. User existence and email status validation
+4. Email confirmation state update
+5. Response with confirmed user data
+
+**Resend Email Confirmation Flow**:
+1. User lookup by email address
+2. Validation of resend eligibility (exists + not confirmed)
+3. Invalidation of existing email-confirmation tokens
+4. New token generation with fresh expiration
+5. Email dispatch with updated verification link
+
+### Security Best Practices
+- Token invalidation before generating new tokens
+- Type-safe token validation with domain objects
+- Transactional operations for data consistency
+- Comprehensive error handling with proper status codes
+- Input validation using class-validator decorators
+
+## Protocol-Agnostic Architecture
+
+### Multi-Protocol Support Design
+Architecture designed for easy addition of REST, gRPC, and AMQP:
+
+**Application Layer Independence**:
+- Command/Query handlers have no knowledge of communication protocols
+- Domain errors work across all protocols via exception filters
+- Business logic completely decoupled from presentation concerns
+
+**Protocol Addition Strategy**:
+```typescript
+// REST Controller
+@Controller('auth')
+export class AuthController {
+  @Post('signup')
+  async signUp(@Body() dto: SignUpDto) {
+    return this.commandBus.execute(new SignUpCommand(...dto));
+  }
+}
+
+// gRPC Service
+@GrpcMethod('AuthService', 'SignUp')
+async signUp(data: SignUpRequest): Promise<SignUpResponse> {
+  return this.commandBus.execute(new SignUpCommand(...data));
+}
+
+// AMQP Consumer
+@EventPattern('auth.signup')
+async handleSignUp(data: SignUpMessage) {
+  await this.commandBus.execute(new SignUpCommand(...data));
+}
+```
+
+**Scalability Considerations**:
+- BullMQ integration recommended for email queuing (performance + reliability)
+- Microservice extraction possible when scale demands it
+- Clean boundaries enable independent deployment and scaling
