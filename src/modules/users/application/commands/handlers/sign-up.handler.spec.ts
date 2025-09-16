@@ -180,7 +180,7 @@ describe("SignUpHandler", () => {
       userQueryRepository.findUserByEmail.mockResolvedValue(existingUser);
 
       // Act & Assert
-      await expect(signUpHandler.execute(signUpCommand)).rejects.toThrow("User already exists");
+      await expect(signUpHandler.execute(signUpCommand)).rejects.toThrow("Entity already exists");
 
       // Verify that no user creation or email sending occurs
       expect(mockRepositoryContext.userCommandRepository.createUser).not.toHaveBeenCalled();

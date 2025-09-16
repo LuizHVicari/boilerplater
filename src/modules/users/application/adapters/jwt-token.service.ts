@@ -1,6 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { type ConfigType } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
+import { InvalidTokenError } from "@shared/errors/domain-errors";
 import { millisecondsToSeconds } from "src/shared/utils/time";
 import { v4 as uuidv4 } from "uuid";
 
@@ -54,7 +55,7 @@ export class JWTTokenService implements TokenService {
     const decoded: DecodedJwtPayload = this.jwtService.decode(token);
 
     if (!decoded?.type) {
-      throw new Error("Invalid token format");
+      throw new InvalidTokenError();
     }
 
     const payload: DecodedJwtPayload = await this.jwtService.verifyAsync(token, {
@@ -83,7 +84,7 @@ export class JWTTokenService implements TokenService {
     if (tokenType === "password-recovery") {
       return this.jwtSettings.passwordResetTokenTtl;
     }
-    throw new Error("Invalid token type");
+    throw new InvalidTokenError();
   }
 
   private getTokenSecret(tokenType: AuthToken["type"]): string {
@@ -99,6 +100,6 @@ export class JWTTokenService implements TokenService {
     if (tokenType === "password-recovery") {
       return this.jwtSettings.passwordResetSecret;
     }
-    throw new Error("Invalid token type");
+    throw new InvalidTokenError();
   }
 }

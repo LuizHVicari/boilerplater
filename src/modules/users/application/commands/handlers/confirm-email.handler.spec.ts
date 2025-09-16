@@ -195,7 +195,7 @@ describe("ConfirmEmailHandler", () => {
       userQueryRepository.findUserById.mockResolvedValue(undefined);
 
       // Act & Assert
-      await expect(confirmEmailHandler.execute(command)).rejects.toThrow("User not found");
+      await expect(confirmEmailHandler.execute(command)).rejects.toThrow("Entity not found");
 
       // Verify that no user update occurs
       expect(unitOfWork.execute).not.toHaveBeenCalled();
@@ -231,7 +231,7 @@ describe("ConfirmEmailHandler", () => {
       userQueryRepository.findUserById.mockResolvedValue(mockUser);
 
       // Act & Assert
-      await expect(confirmEmailHandler.execute(command)).rejects.toThrow("Email already confirmed");
+      await expect(confirmEmailHandler.execute(command)).rejects.toThrow("Already processed");
 
       // Verify that no user update occurs
       expect(unitOfWork.execute).not.toHaveBeenCalled();

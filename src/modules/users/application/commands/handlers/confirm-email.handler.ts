@@ -1,6 +1,8 @@
 import { UNIT_OF_WORK, type UnitOfWork } from "@common/application/ports/unit-of-work.service";
 import { Inject } from "@nestjs/common";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
+import { InvalidTokenError, TokenInvalidatedError } from "@shared/errors/domain-errors";
+import { EmailAlreadyConfirmedError, UserNotFoundError } from "@users/domain/errors/user-errors";
 
 import { TOKEN_SERVICE, type TokenService } from "../../ports/token.service";
 import {
@@ -29,23 +31,23 @@ export class ConfirmEmailHandler implements ICommandHandler<ConfirmEmailCommand>
   async execute({ token }: ConfirmEmailCommand): Promise<ConfirmEmailCommandResponse> {
     const tokenPayload = await this.tokenService.verifyToken(token);
     if (tokenPayload.type !== "email-confirmation") {
-      throw new Error("Invalid token");
+      throw new InvalidTokenError();
     }
 
     const isTokenValid = await this.tokenInvalidationRepo.verifyTokenValid(tokenPayload);
 
     if (!isTokenValid) {
-      throw new Error("Token has been invalidated");
+      throw new TokenInvalidatedError();
     }
 
     const { sub } = tokenPayload;
     const user = await this.userQueryRepo.findUserById(sub);
     if (!user) {
-      throw new Error("User not found");
+      throw new UserNotFoundError();
     }
 
     if (user.emailConfirmed) {
-      throw new Error("Email already confirmed");
+      throw new EmailAlreadyConfirmedError();
     }
 
     user.confirmEmail();

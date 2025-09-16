@@ -2,6 +2,7 @@ import { EMAIL_SERVICE, type EmailService } from "@common/application/ports/emai
 import { UNIT_OF_WORK, type UnitOfWork } from "@common/application/ports/unit-of-work.service";
 import { Inject } from "@nestjs/common";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
+import { UserAlreadyExistsError } from "@users/domain/errors/user-errors";
 import { UserModel } from "@users/domain/models/user.model";
 
 import { PASSWORD_SERVICE, type PasswordService } from "../../ports/password.service";
@@ -49,7 +50,7 @@ export class SignUpHandler implements ICommandHandler<SignUpCommand> {
       ]);
 
       if (existingUser) {
-        throw new Error("User already exists");
+        throw new UserAlreadyExistsError();
       }
 
       const user = new UserModel({

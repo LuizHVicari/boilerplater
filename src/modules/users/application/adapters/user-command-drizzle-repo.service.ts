@@ -1,4 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
+import { ValidationError } from "@shared/errors/domain-errors";
+import { UserNotFoundError } from "@users/domain/errors/user-errors";
 import { eq } from "drizzle-orm";
 import { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { DB_TOKEN } from "src/db";
@@ -22,7 +24,7 @@ export class UserCommandDrizzleRepo implements UserCommandRepository {
     const [createdUser] = await this.db.insert(usersTable).values(newUser).returning();
 
     if (!createdUser) {
-      throw new Error("User not created");
+      throw new ValidationError();
     }
 
     return this.mapper.dB2Model(createdUser);
@@ -37,7 +39,7 @@ export class UserCommandDrizzleRepo implements UserCommandRepository {
       .returning();
 
     if (!savedUser) {
-      throw new Error("User not updated");
+      throw new UserNotFoundError();
     }
 
     return this.mapper.dB2Model(savedUser);
@@ -49,7 +51,7 @@ export class UserCommandDrizzleRepo implements UserCommandRepository {
       .where(eq(usersTable.id, userId))
       .returning({ deletedId: usersTable.id });
     if (deletedUsers.length === 0) {
-      throw new Error("User not found");
+      throw new UserNotFoundError();
     }
   }
 }

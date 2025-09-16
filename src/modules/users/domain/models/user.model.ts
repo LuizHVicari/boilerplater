@@ -1,3 +1,4 @@
+import { ValidationError } from "@shared/errors/domain-errors";
 import { v7 } from "uuid";
 
 interface UserProps {
@@ -135,7 +136,7 @@ export class UserModel {
 
   private validatePassword(password: string): void {
     if (!password.startsWith("$2b$")) {
-      throw new Error("Password must be hashed before creating User entity");
+      throw new ValidationError();
     }
   }
 }
