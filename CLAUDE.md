@@ -538,12 +538,32 @@ Complete implementation of secure authentication flows:
 4. New token generation with fresh expiration
 5. Email dispatch with updated verification link
 
+**Password Reset Flow**:
+1. **Forgot Password**: User requests password reset via email
+   - Silent failure for non-existent emails (security)
+   - Invalidates all existing password-recovery tokens
+   - Generates new password-recovery token
+   - Sends email with reset link
+2. **Reset Password**: User resets password using token from email
+   - Validates token type (password-recovery only)
+   - Checks token not invalidated
+   - Verifies user active and email confirmed
+   - Updates password with bcrypt hash
+3. **Update Password**: Authenticated user changes password
+   - Validates current password
+   - Optional session invalidation (configurable)
+   - Returns new access token + refresh token as secure cookie
+   - Environment-based cookie configuration (COOKIES_SECURE, REFRESH_TOKEN_MAX_AGE)
+
 ### Security Best Practices
 - Token invalidation before generating new tokens
 - Type-safe token validation with domain objects
 - Transactional operations for data consistency
 - Comprehensive error handling with proper status codes
 - Input validation using class-validator decorators
+- Refresh tokens sent as HTTP-only cookies for XSS protection
+- Configurable cookie security (secure flag) for different environments
+- Silent failure for forgot password on non-existent emails
 
 ## Protocol-Agnostic Architecture
 
@@ -583,3 +603,29 @@ async handleSignUp(data: SignUpMessage) {
 - BullMQ integration recommended for email queuing (performance + reliability)
 - Microservice extraction possible when scale demands it
 - Clean boundaries enable independent deployment and scaling
+
+## GraphQL Resolver Implementation
+
+### Password Management Endpoints
+Complete GraphQL mutations for password operations:
+
+**Mutations Available**:
+- `signUp`: User registration with email confirmation
+- `confirmEmail`: Email verification using JWT token
+- `resendEmailConfirmation`: Resend verification email
+- `forgotPassword`: Request password reset link
+- `resetPassword`: Reset password using token from email
+- `updatePassword`: Change password for authenticated users
+
+**Security Features**:
+- Authentication required for `updatePassword` (extracts user from context)
+- Refresh tokens returned as HTTP-only cookies
+- Access tokens returned in GraphQL response
+- Environment-based cookie configuration
+- Input validation with class-validator decorators
+
+**Cookie Configuration**:
+- `COOKIES_SECURE`: Controls secure flag (false for dev, true for prod)
+- `REFRESH_TOKEN_MAX_AGE`: TTL in milliseconds (default: 7 days)
+- HTTP-only cookies prevent XSS attacks
+- SameSite=strict for CSRF protection

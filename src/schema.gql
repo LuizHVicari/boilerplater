@@ -2,17 +2,56 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+input ConfirmEmailInput {
+  token: String!
+}
+
+type ConfirmEmailResponse {
+  email: String!
+  id: String!
+}
+
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
 scalar DateTime
 
+input ForgotPasswordInput {
+  email: String!
+}
+
+type ForgotPasswordResponse {
+  email: String!
+}
+
 type Mutation {
+  confirmEmail(input: ConfirmEmailInput!): ConfirmEmailResponse!
+  forgotPassword(input: ForgotPasswordInput!): ForgotPasswordResponse!
+  resendEmailConfirmation(input: ResendEmailConfirmationInput!): ResendEmailConfirmationResponse!
+  resetPassword(input: ResetPasswordInput!): ResetPasswordResponse!
   signUp(input: SignUpInput!): SignUpResponse!
+  updatePassword(input: UpdatePasswordInput!): UpdatePasswordResponse!
 }
 
 type Query {
   hello: String!
+}
+
+input ResendEmailConfirmationInput {
+  email: String!
+}
+
+type ResendEmailConfirmationResponse {
+  email: String!
+}
+
+input ResetPasswordInput {
+  password: String!
+  token: String!
+}
+
+type ResetPasswordResponse {
+  email: String!
 }
 
 input SignUpInput {
@@ -29,4 +68,15 @@ type SignUpResponse {
   id: String!
   lastName: String
   updatedAt: DateTime!
+}
+
+input UpdatePasswordInput {
+  currentPassword: String!
+  invalidateSessions: Boolean! = false
+  newPassword: String!
+}
+
+type UpdatePasswordResponse {
+  accessToken: String!
+  email: String!
 }

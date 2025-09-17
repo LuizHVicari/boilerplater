@@ -18,8 +18,9 @@ import { UserModel } from "@users/domain/models/user.model";
 import {
   EmailAlreadyConfirmedError,
   UserNotFoundError,
-} from "src/modules/users/domain/errors/user-errors";
+} from "src/modules/users/domain/errors/user.errors";
 
+import { EMAIL_CONFIG_SERVICE, type EmailConfigService } from "../../ports/email-config.service";
 import { TOKEN_SERVICE, type TokenService } from "../../ports/token.service";
 import {
   TOKEN_INVALIDATION_REPOSITORY,
@@ -38,6 +39,7 @@ describe("ResendEmailConfirmationHandler", () => {
   let emailService: jest.Mocked<EmailService>;
   let tokenInvalidationRepo: jest.Mocked<TokenInvalidationRepository>;
   let tokenService: jest.Mocked<TokenService>;
+  let emailConfigService: jest.Mocked<EmailConfigService>;
 
   beforeEach(() => {
     const { unit, unitRef } = TestBed.create(ResendEmailConfirmationHandler).compile();
@@ -47,6 +49,13 @@ describe("ResendEmailConfirmationHandler", () => {
     emailService = unitRef.get(EMAIL_SERVICE);
     tokenInvalidationRepo = unitRef.get(TOKEN_INVALIDATION_REPOSITORY);
     tokenService = unitRef.get(TOKEN_SERVICE);
+    emailConfigService = unitRef.get(EMAIL_CONFIG_SERVICE);
+
+    // Setup EmailConfigService mock values
+    emailConfigService.appName = "My App";
+    emailConfigService.supportEmail = "Lx0dR@example.com";
+    emailConfigService.baseUrl = "https://example.com";
+    emailConfigService.verificationPath = "/verify";
   });
 
   afterEach(() => {

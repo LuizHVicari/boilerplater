@@ -2,7 +2,10 @@ import { UNIT_OF_WORK, type UnitOfWork } from "@common/application/ports/unit-of
 import { Inject } from "@nestjs/common";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { InvalidTokenError, TokenInvalidatedError } from "@shared/errors/domain-errors";
-import { EmailAlreadyConfirmedError, UserNotFoundError } from "@users/domain/errors/user-errors";
+import {
+  EmailAlreadyConfirmedError,
+  UserNotFoundError,
+} from "src/modules/users/domain/errors/user.errors";
 
 import { TOKEN_SERVICE, type TokenService } from "../../ports/token.service";
 import {

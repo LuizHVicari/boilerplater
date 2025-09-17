@@ -20,5 +20,73 @@
     "javascriptreact",
     "typescript",
     "typescriptreact"
+  ],
+  "material-icon-theme.files.customClones": [
+    {
+      "name": "nest-model",
+      "base": "nest",
+      "color": "cyan-400",
+      "fileExtensions": ["model.ts", "entity.ts"]
+    },
+    {
+      "name": "nest-repository",
+      "base": "nest",
+      "color": "brown-400",
+      "fileExtensions": ["repository.ts"]
+    },
+    {
+      "name": "nest-strategy",
+      "base": "nest",
+      "color": "orange-400",
+      "fileExtensions": ["strategy.ts"]
+    },
+    {
+      "name": "nest-command",
+      "base": "nest",
+      "color": "green-400",
+      "fileExtensions": ["command.ts"]
+    },
+    {
+      "name": "nest-handler",
+      "base": "nest",
+      "color": "purple-400",
+      "fileExtensions": ["handler.ts"]
+    },
+    {
+      "name": "nest-query",
+      "base": "nest",
+      "color": "indigo-400",
+      "fileExtensions": ["query.ts"]
+    },
+    {
+      "name": "nest-dto",
+      "base": "nest",
+      "color": "light-blue-400",
+      "fileExtensions": ["dto.ts"]
+    },
+    {
+      "name": "nest-error",
+      "base": "nest",
+      "color": "red-400",
+      "fileExtensions": ["error.ts", "errors.ts", "vo.ts"]
+    },
+    {
+      "name": "nest-input",
+      "base": "nest",
+      "color": "pink-400",
+      "fileExtensions": ["input.ts"]
+    },
+    {
+      "name": "nest-config",
+      "base": "nest",
+      "color": "brown-400",
+      "fileExtensions": ["config.ts"]
+    },
+    {
+      "name": "nest-mapper",
+      "base": "nest",
+      "color": "deep-purple-400",
+      "fileExtensions": ["mapper.ts"]
+    }
   ]
 }

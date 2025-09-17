@@ -2,9 +2,10 @@ import { EMAIL_SERVICE, type EmailService } from "@common/application/ports/emai
 import { UNIT_OF_WORK, type UnitOfWork } from "@common/application/ports/unit-of-work.service";
 import { Inject } from "@nestjs/common";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { UserAlreadyExistsError } from "@users/domain/errors/user-errors";
 import { UserModel } from "@users/domain/models/user.model";
+import { UserAlreadyExistsError } from "src/modules/users/domain/errors/user.errors";
 
+import { EMAIL_CONFIG_SERVICE, type EmailConfigService } from "../../ports/email-config.service";
 import { PASSWORD_SERVICE, type PasswordService } from "../../ports/password.service";
 import { TOKEN_SERVICE, type TokenService } from "../../ports/token.service";
 import {
@@ -32,6 +33,8 @@ export class SignUpHandler implements ICommandHandler<SignUpCommand> {
     private readonly userQueryRepo: UserQueryRepository,
     @Inject(PASSWORD_SERVICE)
     private readonly passwordService: PasswordService,
+    @Inject(EMAIL_CONFIG_SERVICE)
+    private readonly emailConfigService: EmailConfigService,
   ) {}
 
   async execute({
@@ -72,11 +75,11 @@ export class SignUpHandler implements ICommandHandler<SignUpCommand> {
         subject: "Welcome to our platform",
         template: "email-verification",
         context: {
-          appName: "My App",
+          appName: this.emailConfigService.appName,
           userName: user.firstName ?? user.email,
-          verificationUrl: `https://example.com/verify?token=${token}`,
+          verificationUrl: `${this.emailConfigService.baseUrl}${this.emailConfigService.verificationPath}?token=${token}`,
           expirationTime: "1 day",
-          supportEmail: "Lx0dR@example.com",
+          supportEmail: this.emailConfigService.supportEmail,
         },
       });
       return createdUser;

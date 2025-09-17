@@ -1,14 +1,14 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { ValidationError } from "@shared/errors/domain-errors";
-import { UserNotFoundError } from "@users/domain/errors/user-errors";
 import { eq } from "drizzle-orm";
 import { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { DB_TOKEN } from "src/db";
 import { usersTable } from "src/db/schema";
+import { UserNotFoundError } from "src/modules/users/domain/errors/user.errors";
 
 import { UserModel } from "../../domain/models/user.model";
 import { UserCommandRepository } from "../ports/user-command-repo.service";
-import { UserModelSchemaMapper } from "./user-model-schema-mapper";
+import { UserModelSchemaMapper } from "./user-model-schema.mapper";
 
 @Injectable()
 export class UserCommandDrizzleRepo implements UserCommandRepository {

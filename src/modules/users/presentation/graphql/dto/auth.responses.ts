@@ -35,3 +35,24 @@ export class ResendEmailConfirmationResponse {
   @Field()
   email: string;
 }
+
+@ObjectType()
+export class ForgotPasswordResponse {
+  @Field()
+  email: string;
+}
+
+@ObjectType()
+export class ResetPasswordResponse {
+  @Field()
+  email: string;
+}
+
+@ObjectType()
+export class UpdatePasswordResponse {
+  @Field()
+  email: string;
+
+  @Field()
+  accessToken: string;
+}

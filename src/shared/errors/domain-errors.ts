@@ -36,3 +36,13 @@ export class AlreadyProcessedError extends DomainError {
   readonly code = HTTP_STATUS.CONFLICT;
   readonly message = "Already processed";
 }
+
+export class InvalidStateError extends DomainError {
+  readonly code = HTTP_STATUS.CONFLICT;
+  readonly message = "Invalid state";
+}
+
+export class InvalidCredentialsError extends DomainError {
+  readonly code = HTTP_STATUS.UNAUTHORIZED;
+  readonly message = "Invalid credentials";
+}

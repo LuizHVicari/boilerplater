@@ -18,6 +18,7 @@ import { EMAIL_SERVICE, type EmailService } from "@common/application/ports/emai
 import { UNIT_OF_WORK, type UnitOfWork } from "@common/application/ports/unit-of-work.service";
 import { UserModel } from "@users/domain/models/user.model";
 
+import { EMAIL_CONFIG_SERVICE, type EmailConfigService } from "../../ports/email-config.service";
 import { PASSWORD_SERVICE, type PasswordService } from "../../ports/password.service";
 import { TOKEN_SERVICE, type TokenService } from "../../ports/token.service";
 import {
@@ -39,6 +40,7 @@ describe("SignUpHandler", () => {
   let userQueryRepository: jest.Mocked<UserQueryRepository>;
   let tokenService: jest.Mocked<TokenService>;
   let tokenInvalidationRepo: jest.Mocked<TokenInvalidationRepository>;
+  let emailConfigService: jest.Mocked<EmailConfigService>;
   let mockRepositoryContext: any;
 
   beforeEach(() => {
@@ -51,6 +53,7 @@ describe("SignUpHandler", () => {
     userQueryRepository = unitRef.get(USER_QUERY_REPOSITORY);
     tokenService = unitRef.get(TOKEN_SERVICE);
     tokenInvalidationRepo = unitRef.get(TOKEN_INVALIDATION_REPOSITORY);
+    emailConfigService = unitRef.get(EMAIL_CONFIG_SERVICE);
 
     // Mock repository context with createUser method
     mockRepositoryContext = {
@@ -64,6 +67,12 @@ describe("SignUpHandler", () => {
     unitOfWork.execute.mockImplementation(async callback => {
       return callback(mockRepositoryContext);
     });
+
+    // Setup EmailConfigService mock values
+    emailConfigService.appName = "My App";
+    emailConfigService.supportEmail = "Lx0dR@example.com";
+    emailConfigService.baseUrl = "https://example.com";
+    emailConfigService.verificationPath = "/verify";
   });
 
   afterEach(() => {

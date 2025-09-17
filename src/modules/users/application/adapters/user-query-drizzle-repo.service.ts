@@ -7,7 +7,7 @@ import { usersTable } from "src/db/schema";
 import { UserModel } from "src/modules/users/domain/models/user.model";
 
 import { ListUserProps, UserQueryRepository } from "../ports/user-query-repo.service";
-import { UserModelSchemaMapper } from "./user-model-schema-mapper";
+import { UserModelSchemaMapper } from "./user-model-schema.mapper";
 
 @Injectable()
 export class UserQueryDrizzleRepository implements UserQueryRepository {

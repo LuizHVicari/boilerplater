@@ -1,14 +1,28 @@
 import { CommandBus } from "@nestjs/cqrs";
-import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
+import { Args, Context, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { ConfirmEmailCommand } from "@users/application/commands/confirm-email.command";
+import { ForgotPassowordCommand } from "@users/application/commands/forgot-password.command";
 import { ResendEmailConfirmationCommand } from "@users/application/commands/resend-email-confirmation.command";
+import { ResetPasswordCommand } from "@users/application/commands/reset-password.command";
 import { SignUpCommand } from "@users/application/commands/sign-up.command";
+import { UpdatePasswordCommand } from "@users/application/commands/update-password.command";
+import { Response } from "express";
 
-import { ConfirmEmailInput, ResendEmailConfirmationInput, SignUpInput } from "../dto/auth.input";
+import {
+  ConfirmEmailInput,
+  ForgotPasswordInput,
+  ResendEmailConfirmationInput,
+  ResetPasswordInput,
+  SignUpInput,
+  UpdatePasswordInput,
+} from "../dto/auth.input";
 import {
   ConfirmEmailResponse,
+  ForgotPasswordResponse,
   ResendEmailConfirmationResponse,
+  ResetPasswordResponse,
   SignUpResponse,
+  UpdatePasswordResponse,
 } from "../dto/auth.responses";
 
 @Resolver()
@@ -56,6 +70,61 @@ export class AuthResolver {
 
     return {
       email,
+    };
+  }
+
+  @Mutation(() => ForgotPasswordResponse)
+  async forgotPassword(@Args("input") input: ForgotPasswordInput): Promise<ForgotPasswordResponse> {
+    const { email } = await this.commandBus.execute(new ForgotPassowordCommand(input.email));
+
+    return {
+      email,
+    };
+  }
+
+  @Mutation(() => ResetPasswordResponse)
+  async resetPassword(@Args("input") input: ResetPasswordInput): Promise<ResetPasswordResponse> {
+    const { email } = await this.commandBus.execute(
+      new ResetPasswordCommand(input.token, input.password),
+    );
+
+    return {
+      email,
+    };
+  }
+
+  @Mutation(() => UpdatePasswordResponse)
+  async updatePassword(
+    @Args("input") input: UpdatePasswordInput,
+    @Context() context: { req: { user?: { id: string } }; res: Response },
+  ): Promise<UpdatePasswordResponse> {
+    const userId = context.req.user?.id;
+    if (!userId) {
+      throw new Error("User not authenticated");
+    }
+
+    const { email, accessToken, refreshToken } = await this.commandBus.execute(
+      new UpdatePasswordCommand(
+        userId,
+        input.currentPassword,
+        input.newPassword,
+        input.invalidateSessions,
+      ),
+    );
+
+    const isSecure = process.env.COOKIES_SECURE === "true";
+    const maxAge = parseInt(process.env.REFRESH_TOKEN_MAX_AGE ?? "604800000", 10);
+
+    context.res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: isSecure,
+      sameSite: "strict",
+      maxAge,
+    });
+
+    return {
+      email,
+      accessToken,
     };
   }
 }
