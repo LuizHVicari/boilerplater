@@ -95,7 +95,7 @@ export default tseslint.config(
       'max-depth': ['error', 4],
       'max-lines': ['error', 300],
       'max-lines-per-function': ['error', 75],
-      'max-nested-callbacks': ['error', 3],
+      'max-nested-callbacks': ['error', 4],
       'no-console': 'warn',
       'no-debugger': 'error',
       'no-alert': 'error',

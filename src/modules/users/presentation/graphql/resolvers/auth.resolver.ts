@@ -14,8 +14,9 @@ import { SignInCommand } from "@users/application/commands/sign-in.command";
 import { SignOutCommand } from "@users/application/commands/sign-out.command";
 import { SignUpCommand } from "@users/application/commands/sign-up.command";
 import { UpdatePasswordCommand } from "@users/application/commands/update-password.command";
-import { JwtAuthGuard } from "@users/application/guards/jwt-auth.guard";
 
+import { GqlCurrentUser } from "../../decorators/gql-current-user.decorator";
+import { GqlJwtAuthGuard } from "../../guards/jwt-gql-auth.guard";
 import {
   ConfirmEmailInput,
   ForgotPasswordInput,
@@ -52,9 +53,9 @@ export class AuthResolver {
   }
 
   @Query(() => MeResponse)
-  @UseGuards(JwtAuthGuard)
-  me(@Context() context: AuthenticatedGraphQLContext): MeResponse {
-    const { user } = context.req.user;
+  @UseGuards(GqlJwtAuthGuard)
+  me(@GqlCurrentUser() currentUser: AuthenticatedGraphQLContext["req"]["user"]): MeResponse {
+    const { user } = currentUser;
 
     return {
       id: user.id,
@@ -174,12 +175,13 @@ export class AuthResolver {
   }
 
   @Mutation(() => UpdatePasswordResponse)
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GqlJwtAuthGuard)
   async updatePassword(
     @Args("input") input: UpdatePasswordInput,
-    @Context() context: AuthenticatedGraphQLContext,
+    @GqlCurrentUser() currentUser: AuthenticatedGraphQLContext["req"]["user"],
+    @Context() context: GraphQLContext,
   ): Promise<UpdatePasswordResponse> {
-    const userId = context.req.user.user.id;
+    const userId = currentUser.user.id;
 
     const { email, accessToken, refreshToken } = await this.commandBus.execute(
       new UpdatePasswordCommand(

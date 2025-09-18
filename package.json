@@ -16,6 +16,7 @@
     "lint:fix": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix --cache",
     "type-check": "tsc --noEmit",
     "test": "jest",
+    "verify": "pnpm run type-check && pnpm run lint && pnpm run test && pnpm run build",
     "test:watch": "jest --watch --verbose",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
