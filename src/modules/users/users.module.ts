@@ -12,6 +12,8 @@ import { ConfirmEmailHandler } from "./application/commands/handlers/confirm-ema
 import { ForgotPasswordHandler } from "./application/commands/handlers/forgot-password.handler";
 import { ResendEmailConfirmationHandler } from "./application/commands/handlers/resend-email-confirmation.handler";
 import { ResetPasswordHandler } from "./application/commands/handlers/reset-password.handler";
+import { SignInHandler } from "./application/commands/handlers/sign-in.handler";
+import { SignOutHandler } from "./application/commands/handlers/sign-out.handler";
 import { SignUpHandler } from "./application/commands/handlers/sign-up.handler";
 import { UpdatePasswordHandler } from "./application/commands/handlers/update-password.handler";
 import { EMAIL_CONFIG_SERVICE } from "./application/ports/email-config.service";
@@ -21,6 +23,7 @@ import { TOKEN_INVALIDATION_REPOSITORY } from "./application/ports/token-invalid
 import { USER_QUERY_REPOSITORY } from "./application/ports/user-query-repo.service";
 import { AuthValidationService } from "./application/services/auth-validation.service";
 import { JwtStrategy } from "./application/strategies/jwt.strategy";
+import { LocalStrategy } from "./application/strategies/local.strategy";
 import emailConfig from "./config/email.config";
 import jwtConfig from "./config/jwt.config";
 import { AuthResolver } from "./presentation/graphql/resolvers/auth.resolver";
@@ -34,6 +37,7 @@ import { AuthResolver } from "./presentation/graphql/resolvers/auth.resolver";
   ],
   providers: [
     JwtStrategy,
+    LocalStrategy,
     AuthValidationService,
     { provide: TOKEN_SERVICE, useClass: JWTTokenService },
     { provide: USER_QUERY_REPOSITORY, useClass: UserQueryDrizzleRepository },
@@ -42,6 +46,8 @@ import { AuthResolver } from "./presentation/graphql/resolvers/auth.resolver";
     { provide: EMAIL_CONFIG_SERVICE, useClass: NestJSEmailConfigService },
     AuthResolver,
     SignUpHandler,
+    SignInHandler,
+    SignOutHandler,
     ConfirmEmailHandler,
     ResendEmailConfirmationHandler,
     ForgotPasswordHandler,

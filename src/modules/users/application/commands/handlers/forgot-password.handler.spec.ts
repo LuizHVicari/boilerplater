@@ -26,7 +26,7 @@ import {
   TokenInvalidationRepository,
 } from "../../ports/token-invalidation-repo.service";
 import { USER_QUERY_REPOSITORY, UserQueryRepository } from "../../ports/user-query-repo.service";
-import { ForgotPassowordCommand } from "../forgot-password.command";
+import { ForgotPasswordCommand } from "../forgot-password.command";
 import { ForgotPasswordHandler } from "./forgot-password.handler";
 
 describe("ForgotPasswordHandler", () => {
@@ -62,7 +62,7 @@ describe("ForgotPasswordHandler", () => {
     it("should successfully resend the reset password email and invalidate previous reset password tokens ", async () => {
       // Arrange
       const email = "test@example.com.br";
-      const command = new ForgotPassowordCommand(email);
+      const command = new ForgotPasswordCommand(email);
 
       const mockUser = new UserModel({
         id: "user-123",
@@ -112,7 +112,7 @@ describe("ForgotPasswordHandler", () => {
     it("should fail silently when the user is not registered", async () => {
       // Arrange
       const email = "test@example.com.br";
-      const command = new ForgotPassowordCommand(email);
+      const command = new ForgotPasswordCommand(email);
 
       userQueryRepo.findUserByEmail.mockResolvedValue(undefined);
 
@@ -132,7 +132,7 @@ describe("ForgotPasswordHandler", () => {
     it("should propagate token generation errors", async () => {
       // Arrange
       const email = "test@example.com.br";
-      const command = new ForgotPassowordCommand(email);
+      const command = new ForgotPasswordCommand(email);
       const mockUser = new UserModel({
         id: "user-123",
         email,
@@ -164,7 +164,7 @@ describe("ForgotPasswordHandler", () => {
     it("should propagate email sending errors", async () => {
       // Arrange
       const email = "test@example.com.br";
-      const command = new ForgotPassowordCommand(email);
+      const command = new ForgotPasswordCommand(email);
       const mockUser = new UserModel({
         id: "user-123",
         email,
@@ -198,7 +198,7 @@ describe("ForgotPasswordHandler", () => {
     it("should invalidate previous password-recovery tokens for security", async () => {
       // Arrange
       const email = "test@example.com.br";
-      const command = new ForgotPassowordCommand(email);
+      const command = new ForgotPasswordCommand(email);
       const mockUser = new UserModel({
         id: "user-123",
         email,
@@ -233,7 +233,7 @@ describe("ForgotPasswordHandler", () => {
     it("should send email with proper template and context when user has firstName", async () => {
       // Arrange
       const email = "test@example.com.br";
-      const command = new ForgotPassowordCommand(email);
+      const command = new ForgotPasswordCommand(email);
       const mockUser = new UserModel({
         id: "user-123",
         email,
@@ -271,7 +271,7 @@ describe("ForgotPasswordHandler", () => {
     it("should send email with email as userName when user has no firstName", async () => {
       // Arrange
       const email = "test@example.com.br";
-      const command = new ForgotPassowordCommand(email);
+      const command = new ForgotPasswordCommand(email);
       const mockUser = new UserModel({
         id: "user-123",
         email,

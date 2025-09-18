@@ -15,10 +15,10 @@ import {
   USER_QUERY_REPOSITORY,
   type UserQueryRepository,
 } from "../../ports/user-query-repo.service";
-import { ForgotPassowordCommand, ForgotPassowordCommandResponse } from "../forgot-password.command";
+import { ForgotPasswordCommand, ForgotPasswordCommandResponse } from "../forgot-password.command";
 
-@CommandHandler(ForgotPassowordCommand)
-export class ForgotPasswordHandler implements ICommandHandler<ForgotPassowordCommand> {
+@CommandHandler(ForgotPasswordCommand)
+export class ForgotPasswordHandler implements ICommandHandler<ForgotPasswordCommand> {
   constructor(
     @Inject(EMAIL_SERVICE)
     private readonly emailService: EmailService,
@@ -32,7 +32,7 @@ export class ForgotPasswordHandler implements ICommandHandler<ForgotPassowordCom
     private readonly emailConfigService: EmailConfigService,
   ) {}
 
-  async execute({ email }: ForgotPassowordCommand): Promise<ForgotPassowordCommandResponse> {
+  async execute({ email }: ForgotPasswordCommand): Promise<ForgotPasswordCommandResponse> {
     const user = await this.userQueryRepo.findUserByEmail(email);
     if (!user) {
       return { email };

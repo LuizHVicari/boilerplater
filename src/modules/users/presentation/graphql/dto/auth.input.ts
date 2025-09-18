@@ -60,6 +60,19 @@ export class ResetPasswordInput {
 }
 
 @InputType()
+export class SignInInput {
+  @Field()
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+
+  @Field()
+  @IsString()
+  @IsNotEmpty()
+  password: string;
+}
+
+@InputType()
 export class UpdatePasswordInput {
   @Field()
   @IsStrongPassword()

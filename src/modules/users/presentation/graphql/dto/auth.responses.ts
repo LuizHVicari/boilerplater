@@ -49,6 +49,18 @@ export class ResetPasswordResponse {
 }
 
 @ObjectType()
+export class SignInResponse {
+  @Field()
+  accessToken: string;
+}
+
+@ObjectType()
+export class SignOutResponse {
+  @Field()
+  success: boolean;
+}
+
+@ObjectType()
 export class UpdatePasswordResponse {
   @Field()
   email: string;
