@@ -23,6 +23,7 @@ import { PASSWORD_SERVICE } from "./application/ports/password.service";
 import { TOKEN_SERVICE } from "./application/ports/token.service";
 import { TOKEN_INVALIDATION_REPOSITORY } from "./application/ports/token-invalidation-repo.service";
 import { USER_QUERY_REPOSITORY } from "./application/ports/user-query-repo.service";
+import { ValidateAuthTokenHandler } from "./application/queries/handlers/validate-auth-token.handler";
 import { AuthValidationService } from "./application/services/auth-validation.service";
 import { JwtStrategy } from "./application/strategies/jwt.strategy";
 import { LocalStrategy } from "./application/strategies/local.strategy";
@@ -57,6 +58,7 @@ import { AuthResolver } from "./presentation/graphql/resolvers/auth.resolver";
     ForgotPasswordHandler,
     ResetPasswordHandler,
     UpdatePasswordHandler,
+    ValidateAuthTokenHandler,
   ],
 })
 export class UsersModule {}

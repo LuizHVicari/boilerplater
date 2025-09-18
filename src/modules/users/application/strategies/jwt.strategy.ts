@@ -1,13 +1,13 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { type ConfigType } from "@nestjs/config";
-import { JwtService } from "@nestjs/jwt";
+import { QueryBus } from "@nestjs/cqrs";
 import { PassportStrategy } from "@nestjs/passport";
 import { ExtractJwt, Strategy } from "passport-jwt";
 
 import jwtConfig from "../../config/jwt.config";
 import { UserModel } from "../../domain/models/user.model";
 import { AuthToken } from "../../domain/value-objects/auth-token.vo";
-import { AuthValidationService } from "../services/auth-validation.service";
+import { ValidateAuthTokenQuery } from "../queries/validate-auth-token.query";
 
 interface JwtPayload {
   sub: string;
@@ -20,9 +20,8 @@ interface JwtPayload {
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
-    private readonly jwtService: JwtService,
+    private readonly queryBus: QueryBus,
     @Inject(jwtConfig.KEY) jwtSettings: ConfigType<typeof jwtConfig>,
-    private readonly authValidationService: AuthValidationService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -33,7 +32,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload: JwtPayload): Promise<{ user: UserModel; token: AuthToken }> {
     const authToken = new AuthToken(payload);
-    const user = await this.authValidationService.validateAuthToken(authToken);
+    const { user } = await this.queryBus.execute(new ValidateAuthTokenQuery(authToken));
 
     return { user, token: authToken };
   }

@@ -1,9 +1,9 @@
 import cookiesConfig from "@common/config/cookies.config";
-import { Inject } from "@nestjs/common";
+import { Inject, UseGuards } from "@nestjs/common";
 import { type ConfigType } from "@nestjs/config";
 import { CommandBus } from "@nestjs/cqrs";
 import { Args, Context, Mutation, Query, Resolver } from "@nestjs/graphql";
-import type { GraphQLContext } from "@shared/types/http.types";
+import type { AuthenticatedGraphQLContext, GraphQLContext } from "@shared/types/http.types";
 import { clearRefreshTokenCookie, extractTokensFromContext } from "@shared/utils/token-extraction";
 import { ConfirmEmailCommand } from "@users/application/commands/confirm-email.command";
 import { ForgotPasswordCommand } from "@users/application/commands/forgot-password.command";
@@ -14,6 +14,7 @@ import { SignInCommand } from "@users/application/commands/sign-in.command";
 import { SignOutCommand } from "@users/application/commands/sign-out.command";
 import { SignUpCommand } from "@users/application/commands/sign-up.command";
 import { UpdatePasswordCommand } from "@users/application/commands/update-password.command";
+import { JwtAuthGuard } from "@users/application/guards/jwt-auth.guard";
 
 import {
   ConfirmEmailInput,
@@ -27,6 +28,7 @@ import {
 import {
   ConfirmEmailResponse,
   ForgotPasswordResponse,
+  MeResponse,
   RefreshTokenResponse,
   ResendEmailConfirmationResponse,
   ResetPasswordResponse,
@@ -47,6 +49,23 @@ export class AuthResolver {
   @Query(() => String)
   hello(): string {
     return "Hello World";
+  }
+
+  @Query(() => MeResponse)
+  @UseGuards(JwtAuthGuard)
+  me(@Context() context: AuthenticatedGraphQLContext): MeResponse {
+    const { user } = context.req.user;
+
+    return {
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      active: user.active,
+      emailConfirmed: user.emailConfirmed,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
   }
 
   @Mutation(() => SignUpResponse)
@@ -155,14 +174,12 @@ export class AuthResolver {
   }
 
   @Mutation(() => UpdatePasswordResponse)
+  @UseGuards(JwtAuthGuard)
   async updatePassword(
     @Args("input") input: UpdatePasswordInput,
-    @Context() context: GraphQLContext & { req: { user?: { id: string } } },
+    @Context() context: AuthenticatedGraphQLContext,
   ): Promise<UpdatePasswordResponse> {
-    const userId = context.req.user?.id;
-    if (!userId) {
-      throw new Error("User not authenticated");
-    }
+    const userId = context.req.user.user.id;
 
     const { email, accessToken, refreshToken } = await this.commandBus.execute(
       new UpdatePasswordCommand(

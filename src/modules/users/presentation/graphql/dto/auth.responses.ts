@@ -74,3 +74,30 @@ export class RefreshTokenResponse {
   @Field()
   accessToken: string;
 }
+
+@ObjectType()
+export class MeResponse {
+  @Field()
+  id: string;
+
+  @Field()
+  email: string;
+
+  @Field({ nullable: true })
+  firstName?: string;
+
+  @Field({ nullable: true })
+  lastName?: string;
+
+  @Field()
+  active: boolean;
+
+  @Field()
+  emailConfirmed: boolean;
+
+  @Field()
+  createdAt: Date;
+
+  @Field()
+  updatedAt: Date;
+}

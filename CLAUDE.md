@@ -611,21 +611,86 @@ Complete GraphQL mutations for password operations:
 
 **Mutations Available**:
 - `signUp`: User registration with email confirmation
+- `signIn`: User authentication with JWT tokens
+- `signOut`: Logout with token invalidation
+- `refreshToken`: Generate new access token using refresh token
 - `confirmEmail`: Email verification using JWT token
 - `resendEmailConfirmation`: Resend verification email
 - `forgotPassword`: Request password reset link
 - `resetPassword`: Reset password using token from email
-- `updatePassword`: Change password for authenticated users
+- `updatePassword`: Change password for authenticated users (requires auth)
+
+**Queries Available**:
+- `me`: Get current authenticated user data (requires auth)
 
 **Security Features**:
-- Authentication required for `updatePassword` (extracts user from context)
-- Refresh tokens returned as HTTP-only cookies
+- JWT authentication with `@UseGuards(JwtAuthGuard)` for protected endpoints
+- Refresh tokens returned as HTTP-only cookies for XSS protection
 - Access tokens returned in GraphQL response
-- Environment-based cookie configuration
+- Environment-based cookie configuration with Joi validation
 - Input validation with class-validator decorators
+- Timing attack protection in authentication flows
+- Token blacklist for secure logout functionality
 
 **Cookie Configuration**:
 - `COOKIES_SECURE`: Controls secure flag (false for dev, true for prod)
 - `REFRESH_TOKEN_MAX_AGE`: TTL in milliseconds (default: 7 days)
 - HTTP-only cookies prevent XSS attacks
 - SameSite=strict for CSRF protection
+
+## JWT Authentication & Authorization
+
+### JWT Guard Implementation
+Complete JWT authentication system with CQRS integration:
+
+**Components**:
+- `JwtStrategy`: Passport strategy using QueryBus for validation
+- `JwtAuthGuard`: Simple wrapper around `AuthGuard("jwt")`
+- `ValidateAuthTokenQuery/Handler`: CQRS query for token validation
+- `AuthenticatedGraphQLContext`: Type-safe context for authenticated requests
+
+**Usage Pattern**:
+```typescript
+@Query(() => MeResponse)
+@UseGuards(JwtAuthGuard)
+me(@Context() context: AuthenticatedGraphQLContext): MeResponse {
+  const { user } = context.req.user;
+  return { id: user.id, email: user.email, ... };
+}
+```
+
+**Framework-Agnostic Design**:
+- `AuthenticatedHttpRequest` extends base `HttpRequest`
+- Ready for Express → Fastify migration
+- Type-safe user context after guard validation
+
+### Token Validation Flow
+1. **JWT Strategy**: Validates token signature and expiration
+2. **CQRS Query**: `ValidateAuthTokenQuery` validates business rules
+3. **Auth Service**: Checks user status, token blacklist, domain rules
+4. **Context Population**: Adds validated user + token to request context
+
+## Security Status & Production Readiness
+
+### ✅ Implemented Security Features
+- **JWT Authentication**: Multi-secret system (access, refresh, email, password-reset)
+- **Password Security**: Bcrypt hashing with timing attack protection
+- **Token Management**: Blacklist/invalidation for secure logout
+- **Cookie Security**: HTTP-only refresh tokens with configurable secure flag
+- **Input Validation**: Joi config validation + class-validator for DTOs
+- **Framework-Agnostic**: Ready for Express → Fastify migration
+
+### ❌ Missing for Production (TODO)
+- **Security Headers**: Helmet integration for CSP, HSTS, etc.
+- **CORS Configuration**: Proper origin whitelist and credentials handling
+- **Rate Limiting**: Brute force protection for auth endpoints
+- **Query Complexity**: GraphQL depth/complexity limiting
+- **AuthResolver Tests**: Unit tests for resolver layer
+
+### 🎯 Next Implementation Priority
+1. Security Headers (Helmet + CSP) - 30 minutes
+2. CORS + Rate Limiting - 45 minutes
+3. AuthResolver comprehensive tests - 2 hours
+4. Optional: `logoutAllDevices` mutation - 30 minutes
+
+**Current Status**: ~75% production-ready. Core authentication flows complete and secure, missing deployment-critical security middleware.

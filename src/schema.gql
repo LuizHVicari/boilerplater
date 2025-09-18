@@ -24,6 +24,17 @@ type ForgotPasswordResponse {
   email: String!
 }
 
+type MeResponse {
+  active: Boolean!
+  createdAt: DateTime!
+  email: String!
+  emailConfirmed: Boolean!
+  firstName: String
+  id: String!
+  lastName: String
+  updatedAt: DateTime!
+}
+
 type Mutation {
   confirmEmail(input: ConfirmEmailInput!): ConfirmEmailResponse!
   forgotPassword(input: ForgotPasswordInput!): ForgotPasswordResponse!
@@ -38,6 +49,7 @@ type Mutation {
 
 type Query {
   hello: String!
+  me: MeResponse!
 }
 
 type RefreshTokenResponse {
