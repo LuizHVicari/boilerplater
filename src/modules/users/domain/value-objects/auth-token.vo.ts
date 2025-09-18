@@ -27,6 +27,10 @@ export class AuthToken {
     return this.type === "access";
   }
 
+  isValidForRefresh(): boolean {
+    return this.type === "refresh";
+  }
+
   isExpired(): boolean {
     return Date.now() > secondsToMilliseconds(this.exp);
   }

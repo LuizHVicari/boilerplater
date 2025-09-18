@@ -3,6 +3,7 @@ import { ConfigModule } from "@nestjs/config";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
 
+import cookiesConfig from "../common/config/cookies.config";
 import { BcryptPasswordService } from "./application/adapters/bcrypt-password.service";
 import { CacheTokenInvalidationRepoService } from "./application/adapters/cache-token-invalidation-repo.service";
 import { JWTTokenService } from "./application/adapters/jwt-token.service";
@@ -10,6 +11,7 @@ import { NestJSEmailConfigService } from "./application/adapters/nestjs-email-co
 import { UserQueryDrizzleRepository } from "./application/adapters/user-query-drizzle-repo.service";
 import { ConfirmEmailHandler } from "./application/commands/handlers/confirm-email.handler";
 import { ForgotPasswordHandler } from "./application/commands/handlers/forgot-password.handler";
+import { RefreshTokenHandler } from "./application/commands/handlers/refresh-token.handler";
 import { ResendEmailConfirmationHandler } from "./application/commands/handlers/resend-email-confirmation.handler";
 import { ResetPasswordHandler } from "./application/commands/handlers/reset-password.handler";
 import { SignInHandler } from "./application/commands/handlers/sign-in.handler";
@@ -32,6 +34,7 @@ import { AuthResolver } from "./presentation/graphql/resolvers/auth.resolver";
   imports: [
     ConfigModule.forFeature(jwtConfig),
     ConfigModule.forFeature(emailConfig),
+    ConfigModule.forFeature(cookiesConfig),
     JwtModule.register({}),
     PassportModule,
   ],
@@ -48,6 +51,7 @@ import { AuthResolver } from "./presentation/graphql/resolvers/auth.resolver";
     SignUpHandler,
     SignInHandler,
     SignOutHandler,
+    RefreshTokenHandler,
     ConfirmEmailHandler,
     ResendEmailConfirmationHandler,
     ForgotPasswordHandler,

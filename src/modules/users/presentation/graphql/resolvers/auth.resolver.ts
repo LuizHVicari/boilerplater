@@ -1,9 +1,13 @@
+import cookiesConfig from "@common/config/cookies.config";
+import { Inject } from "@nestjs/common";
+import { type ConfigType } from "@nestjs/config";
 import { CommandBus } from "@nestjs/cqrs";
 import { Args, Context, Mutation, Query, Resolver } from "@nestjs/graphql";
 import type { GraphQLContext } from "@shared/types/http.types";
 import { clearRefreshTokenCookie, extractTokensFromContext } from "@shared/utils/token-extraction";
 import { ConfirmEmailCommand } from "@users/application/commands/confirm-email.command";
 import { ForgotPasswordCommand } from "@users/application/commands/forgot-password.command";
+import { RefreshTokenCommand } from "@users/application/commands/refresh-token.command";
 import { ResendEmailConfirmationCommand } from "@users/application/commands/resend-email-confirmation.command";
 import { ResetPasswordCommand } from "@users/application/commands/reset-password.command";
 import { SignInCommand } from "@users/application/commands/sign-in.command";
@@ -23,6 +27,7 @@ import {
 import {
   ConfirmEmailResponse,
   ForgotPasswordResponse,
+  RefreshTokenResponse,
   ResendEmailConfirmationResponse,
   ResetPasswordResponse,
   SignInResponse,
@@ -33,7 +38,11 @@ import {
 
 @Resolver()
 export class AuthResolver {
-  constructor(private readonly commandBus: CommandBus) {}
+  constructor(
+    private readonly commandBus: CommandBus,
+    @Inject(cookiesConfig.KEY)
+    private readonly cookiesSettings: ConfigType<typeof cookiesConfig>,
+  ) {}
 
   @Query(() => String)
   hello(): string {
@@ -108,8 +117,8 @@ export class AuthResolver {
       new SignInCommand(input.email, input.password),
     );
 
-    const isSecure = process.env.COOKIES_SECURE === "true";
-    const maxAge = parseInt(process.env.REFRESH_TOKEN_MAX_AGE ?? "604800000", 10);
+    const isSecure = this.cookiesSettings.secure;
+    const maxAge = this.cookiesSettings.refreshTokenMaxAge;
 
     context.res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
@@ -136,6 +145,15 @@ export class AuthResolver {
     return { success };
   }
 
+  @Mutation(() => RefreshTokenResponse)
+  async refreshToken(@Context() context: GraphQLContext): Promise<RefreshTokenResponse> {
+    const { refreshToken } = extractTokensFromContext(context);
+
+    const { accessToken } = await this.commandBus.execute(new RefreshTokenCommand(refreshToken));
+
+    return { accessToken };
+  }
+
   @Mutation(() => UpdatePasswordResponse)
   async updatePassword(
     @Args("input") input: UpdatePasswordInput,
@@ -155,8 +173,8 @@ export class AuthResolver {
       ),
     );
 
-    const isSecure = process.env.COOKIES_SECURE === "true";
-    const maxAge = parseInt(process.env.REFRESH_TOKEN_MAX_AGE ?? "604800000", 10);
+    const isSecure = this.cookiesSettings.secure;
+    const maxAge = this.cookiesSettings.refreshTokenMaxAge;
 
     context.res.cookie("refreshToken", refreshToken, {
       httpOnly: true,

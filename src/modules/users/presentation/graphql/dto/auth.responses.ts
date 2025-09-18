@@ -68,3 +68,9 @@ export class UpdatePasswordResponse {
   @Field()
   accessToken: string;
 }
+
+@ObjectType()
+export class RefreshTokenResponse {
+  @Field()
+  accessToken: string;
+}

@@ -27,14 +27,21 @@ type ForgotPasswordResponse {
 type Mutation {
   confirmEmail(input: ConfirmEmailInput!): ConfirmEmailResponse!
   forgotPassword(input: ForgotPasswordInput!): ForgotPasswordResponse!
+  refreshToken: RefreshTokenResponse!
   resendEmailConfirmation(input: ResendEmailConfirmationInput!): ResendEmailConfirmationResponse!
   resetPassword(input: ResetPasswordInput!): ResetPasswordResponse!
+  signIn(input: SignInInput!): SignInResponse!
+  signOut: SignOutResponse!
   signUp(input: SignUpInput!): SignUpResponse!
   updatePassword(input: UpdatePasswordInput!): UpdatePasswordResponse!
 }
 
 type Query {
   hello: String!
+}
+
+type RefreshTokenResponse {
+  accessToken: String!
 }
 
 input ResendEmailConfirmationInput {
@@ -52,6 +59,19 @@ input ResetPasswordInput {
 
 type ResetPasswordResponse {
   email: String!
+}
+
+input SignInInput {
+  email: String!
+  password: String!
+}
+
+type SignInResponse {
+  accessToken: String!
+}
+
+type SignOutResponse {
+  success: Boolean!
 }
 
 input SignUpInput {
