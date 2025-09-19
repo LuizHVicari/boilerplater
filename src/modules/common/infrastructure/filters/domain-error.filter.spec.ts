@@ -21,9 +21,8 @@ import { EntityNotFoundError, ValidationError } from "@shared/errors/domain-erro
 
 import { DomainErrorFilter } from "./domain-error.filter";
 
-// Test domain error for unknown status codes
 class CustomDomainError extends DomainError {
-  readonly code = 999; // Non-standard HTTP status code
+  readonly code = 999;
   readonly message = "Custom error message";
 }
 
@@ -38,29 +37,24 @@ describe("DomainErrorFilter", () => {
     const { unit } = TestBed.create(DomainErrorFilter).compile();
     domainErrorFilter = unit;
 
-    // Mock HTTP response object
     mockResponse = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
     };
 
-    // Mock HTTP context
     mockHttpContext = {
       getResponse: jest.fn().mockReturnValue(mockResponse),
     };
 
-    // Mock ArgumentsHost
     mockArgumentsHost = {
       getType: jest.fn(),
       switchToHttp: jest.fn().mockReturnValue(mockHttpContext),
     } as unknown as jest.Mocked<ArgumentsHost>;
 
-    // Mock GqlArgumentsHost
     mockGqlArgumentsHost = {
       create: jest.fn(),
     } as unknown as jest.Mocked<GqlArgumentsHost>;
 
-    // Mock GqlArgumentsHost.create static method
     jest.spyOn(GqlArgumentsHost, "create").mockReturnValue(mockGqlArgumentsHost);
   });
 
@@ -98,7 +92,6 @@ describe("DomainErrorFilter", () => {
       // Assert
       expect(mockArgumentsHost.getType).toHaveBeenCalled();
       expect(result).toBe(exception);
-      // Should not call HTTP-specific methods
       expect(mockArgumentsHost.switchToHttp).not.toHaveBeenCalled();
     });
   });
@@ -232,25 +225,21 @@ describe("DomainErrorFilter", () => {
       // Arrange
       const exception = new EntityNotFoundError();
 
-      // Test HTTP delegation
       mockArgumentsHost.getType.mockReturnValue("http");
       jest.clearAllMocks();
 
       // Act
       domainErrorFilter.catch(exception, mockArgumentsHost);
 
-      // Assert HTTP path
       expect(mockArgumentsHost.switchToHttp).toHaveBeenCalled();
       expect(mockResponse.status).toHaveBeenCalled();
 
-      // Test GraphQL delegation
       mockArgumentsHost.getType.mockReturnValue("graphql");
       jest.clearAllMocks();
 
       // Act
       const result = domainErrorFilter.catch(exception, mockArgumentsHost);
 
-      // Assert GraphQL path
       expect(result).toBe(exception);
       expect(mockArgumentsHost.switchToHttp).not.toHaveBeenCalled();
     });

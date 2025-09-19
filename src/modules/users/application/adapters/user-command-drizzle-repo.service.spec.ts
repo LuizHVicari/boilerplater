@@ -134,7 +134,7 @@ describe("UserCommandDrizzleRepo", () => {
 
       // Assert
       expect(result.id).toBeDefined();
-      expect(result.id).toMatch(/^[0-9a-f-]+$/); // UUID format
+      expect(result.id).toMatch(/^[0-9a-f-]+$/);
       expect(result.createdAt).toBeInstanceOf(Date);
       expect(result.updatedAt).toBeInstanceOf(Date);
       expect(result.createdAt.getTime()).toBeLessThanOrEqual(Date.now());
@@ -152,7 +152,7 @@ describe("UserCommandDrizzleRepo", () => {
       };
 
       const userData2 = {
-        email, // Same email
+        email,
         password: "$2b$10$hashedPassword987654321",
         active: true,
         emailConfirmed: false,
@@ -161,7 +161,6 @@ describe("UserCommandDrizzleRepo", () => {
       const user1 = new UserModel(userData1);
       const user2 = new UserModel(userData2);
 
-      // Create first user
       await userCommandRepo.createUser(user1);
 
       // Act & Assert
@@ -169,8 +168,7 @@ describe("UserCommandDrizzleRepo", () => {
     });
 
     it("TC005: Should throw ValidationError when database operation fails", async () => {
-      // Arrange - This test is tricky because we need to force a DB failure
-      // We'll test this by closing the database connection
+      // Arrange
       await databaseHelper.stopContainer();
 
       const userData = {
@@ -185,7 +183,6 @@ describe("UserCommandDrizzleRepo", () => {
       // Act & Assert
       await expect(userCommandRepo.createUser(user)).rejects.toThrow();
 
-      // Restart for next tests
       const { db } = await databaseHelper.startContainer();
       userCommandRepo = new UserCommandDrizzleRepo(db);
     }, 30000);
@@ -193,7 +190,7 @@ describe("UserCommandDrizzleRepo", () => {
 
   describe("updateUser", () => {
     it("TC006: Should update user with new data and return updated user", async () => {
-      // Arrange - Create initial user
+      // Arrange
       const initialData = {
         email: "update@example.com",
         firstName: "Initial",
@@ -206,7 +203,6 @@ describe("UserCommandDrizzleRepo", () => {
       const user = new UserModel(initialData);
       const createdUser = await userCommandRepo.createUser(user);
 
-      // Modify user data
       const updatedUser = new UserModel({
         id: createdUser.id,
         email: "updated@example.com",
@@ -236,7 +232,6 @@ describe("UserCommandDrizzleRepo", () => {
     });
 
     it("TC007: Should update only provided fields, keeping others unchanged", async () => {
-      // Arrange - Create initial user
       const initialData = {
         email: "partial@example.com",
         firstName: "Original",
@@ -249,15 +244,14 @@ describe("UserCommandDrizzleRepo", () => {
       const user = new UserModel(initialData);
       const createdUser = await userCommandRepo.createUser(user);
 
-      // Update only some fields
       const partialUpdate = new UserModel({
         id: createdUser.id,
-        email: createdUser.email, // Keep same
-        firstName: "Updated", // Change this
-        lastName: createdUser.lastName, // Keep same
-        password: createdUser.password, // Keep same
-        active: false, // Change this
-        emailConfirmed: createdUser.emailConfirmed, // Keep same
+        email: createdUser.email,
+        firstName: "Updated",
+        lastName: createdUser.lastName,
+        password: createdUser.password,
+        active: false,
+        emailConfirmed: createdUser.emailConfirmed,
         createdAt: createdUser.createdAt,
         updatedAt: new Date(),
       });
@@ -266,11 +260,11 @@ describe("UserCommandDrizzleRepo", () => {
       const result = await userCommandRepo.updateUser(partialUpdate);
 
       // Assert
-      expect(result.firstName).toBe("Updated"); // Changed
-      expect(result.active).toBe(false); // Changed
-      expect(result.lastName).toBe("Name"); // Unchanged
-      expect(result.email).toBe("partial@example.com"); // Unchanged
-      expect(result.emailConfirmed).toBe(false); // Unchanged
+      expect(result.firstName).toBe("Updated");
+      expect(result.active).toBe(false);
+      expect(result.lastName).toBe("Name");
+      expect(result.email).toBe("partial@example.com");
+      expect(result.emailConfirmed).toBe(false);
     });
 
     it("TC008: Should update updatedAt timestamp automatically", async () => {
@@ -285,10 +279,8 @@ describe("UserCommandDrizzleRepo", () => {
       const createdUser = await userCommandRepo.createUser(user);
       const originalUpdatedAt = createdUser.updatedAt;
 
-      // Wait a bit to ensure timestamp difference
       await new Promise(resolve => setTimeout(resolve, 10));
 
-      // Update user
       const updatedUser = new UserModel({
         id: createdUser.id,
         email: createdUser.email,
@@ -325,7 +317,7 @@ describe("UserCommandDrizzleRepo", () => {
     });
 
     it("TC010: Should throw error when updating to duplicate email", async () => {
-      // Arrange - Create two users
+      // Arrange
       const user1Data = {
         email: "user1@example.com",
         password: "$2b$10$hashedPassword123456789",
@@ -343,10 +335,9 @@ describe("UserCommandDrizzleRepo", () => {
       const user1 = await userCommandRepo.createUser(new UserModel(user1Data));
       const user2 = await userCommandRepo.createUser(new UserModel(user2Data));
 
-      // Try to update user2 with user1's email
       const updatedUser2 = new UserModel({
         id: user2.id,
-        email: user1.email, // Duplicate email
+        email: user1.email,
         firstName: user2.firstName,
         lastName: user2.lastName,
         password: user2.password,
@@ -379,7 +370,7 @@ describe("UserCommandDrizzleRepo", () => {
       // Act
       await userCommandRepo.deleteUser(createdUser.id);
 
-      // Assert - Try to update the deleted user (should fail)
+      // Assert
       const updatedUser = new UserModel({
         id: createdUser.id,
         email: createdUser.email,
@@ -406,7 +397,7 @@ describe("UserCommandDrizzleRepo", () => {
     });
 
     it("TC013: Should handle deletion without affecting other users", async () => {
-      // Arrange - Create multiple users
+      // Arrange
       const userData1 = {
         email: "user1@example.com",
         password: "$2b$10$hashedPassword123456789",
@@ -424,10 +415,10 @@ describe("UserCommandDrizzleRepo", () => {
       const user1 = await userCommandRepo.createUser(new UserModel(userData1));
       const user2 = await userCommandRepo.createUser(new UserModel(userData2));
 
-      // Act - Delete only user1
+      // Act
       await userCommandRepo.deleteUser(user1.id);
 
-      // Assert - user2 should still exist and be updatable
+      // Assert
       const updatedUser2 = new UserModel({
         id: user2.id,
         email: user2.email,
@@ -445,7 +436,6 @@ describe("UserCommandDrizzleRepo", () => {
       const result = await userCommandRepo.updateUser(updatedUser2);
       expect(result.firstName).toBe("StillExists");
 
-      // user1 should be gone
       const tryUpdateUser1 = new UserModel({
         id: user1.id,
         email: user1.email,
@@ -475,14 +465,14 @@ describe("UserCommandDrizzleRepo", () => {
         emailConfirmed: false,
       };
 
-      // Act & Assert - Create
+      // Act & Assert
       const user = new UserModel(initialData);
       const createdUser = await userCommandRepo.createUser(user);
 
       expect(createdUser.email).toBe(initialData.email);
       expect(createdUser.firstName).toBe(initialData.firstName);
 
-      // Act & Assert - Update
+      // Act & Assert
       const updatedUser = new UserModel({
         id: createdUser.id,
         email: createdUser.email,
@@ -501,7 +491,7 @@ describe("UserCommandDrizzleRepo", () => {
       expect(updatedResult.firstName).toBe("Updated");
       expect(updatedResult.emailConfirmed).toBe(true);
 
-      // Act & Assert - Delete
+      // Act & Assert
       await userCommandRepo.deleteUser(createdUser.id);
 
       const deletedCheck = new UserModel({
@@ -522,7 +512,7 @@ describe("UserCommandDrizzleRepo", () => {
     });
 
     it("TC015: Should handle operations on multiple users independently", async () => {
-      // Arrange - Create multiple users
+      // Arrange
       const usersData = [
         {
           email: "multi1@example.com",
@@ -544,12 +534,12 @@ describe("UserCommandDrizzleRepo", () => {
         },
       ];
 
-      // Act - Create all users
+      // Act
       const createdUsers = await Promise.all(
         usersData.map(data => userCommandRepo.createUser(new UserModel(data))),
       );
 
-      // Assert - All users should be created with correct data
+      // Assert
       expect(createdUsers).toHaveLength(3);
       createdUsers.forEach((user, index) => {
         expect(user.email).toBe(usersData[index].email);
@@ -557,7 +547,7 @@ describe("UserCommandDrizzleRepo", () => {
         expect(user.emailConfirmed).toBe(usersData[index].emailConfirmed);
       });
 
-      // Act - Update middle user
+      // Act
       const updatedMiddleUser = new UserModel({
         id: createdUsers[1].id,
         email: createdUsers[1].email,
@@ -575,10 +565,10 @@ describe("UserCommandDrizzleRepo", () => {
       const updateResult = await userCommandRepo.updateUser(updatedMiddleUser);
       expect(updateResult.firstName).toBe("MiddleUpdated");
 
-      // Act - Delete last user
+      // Act
       await userCommandRepo.deleteUser(createdUsers[2].id);
 
-      // Assert - First user should still exist
+      // Assert
       const updatedFirstUser = new UserModel({
         id: createdUsers[0].id,
         email: createdUsers[0].email,
@@ -596,7 +586,7 @@ describe("UserCommandDrizzleRepo", () => {
       const firstResult = await userCommandRepo.updateUser(updatedFirstUser);
       expect(firstResult.lastName).toBe("FirstStillExists");
 
-      // Assert - Last user should be gone
+      // Assert
       const tryUpdateLast = new UserModel({
         id: createdUsers[2].id,
         email: createdUsers[2].email,
@@ -631,7 +621,7 @@ describe("UserCommandDrizzleRepo", () => {
       const user = new UserModel(userData);
       const result = await userCommandRepo.createUser(user);
 
-      // Assert - Verify all data types are preserved
+      // Assert
       expect(typeof result.id).toBe("string");
       expect(typeof result.email).toBe("string");
       expect(typeof result.firstName).toBe("string");
@@ -644,7 +634,6 @@ describe("UserCommandDrizzleRepo", () => {
       expect(typeof result.invitedById).toBe("string");
       expect(result.lastCredentialInvalidation).toBeInstanceOf(Date);
 
-      // Verify values are preserved
       expect(result.email).toBe(userData.email);
       expect(result.firstName).toBe(userData.firstName);
       expect(result.lastName).toBe(userData.lastName);

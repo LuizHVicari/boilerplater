@@ -61,7 +61,6 @@ describe("GqlThrottlerGuard", () => {
         getClass: jest.fn(),
       } as unknown as ExecutionContext;
 
-      // Mock GqlExecutionContext.create
       jest.spyOn(GqlExecutionContext, "create").mockReturnValue({
         getContext: () => mockGqlContext,
         getInfo: jest.fn(),
@@ -146,7 +145,6 @@ describe("GqlThrottlerGuard", () => {
 
   describe("Integration", () => {
     it("TC004: Should work with GraphQL execution context", () => {
-      // Simulate a real GraphQL mutation context
       const mockGraphQLContext = {
         req: {
           ip: "10.0.0.1",
@@ -216,11 +214,9 @@ describe("GqlThrottlerGuard", () => {
 
       const { req, res } = guard.getRequestResponse(execContext);
 
-      // Verify that the mapping preserves the original objects
       expect(req).toBe(originalReq);
       expect(res).toBe(originalRes);
 
-      // Verify structure is suitable for throttling
       expect(req).toHaveProperty("ip");
       expect(req).toHaveProperty("headers");
       expect(res).toHaveProperty("setHeader");
@@ -229,7 +225,6 @@ describe("GqlThrottlerGuard", () => {
     it("TC006: Should handle malformed contexts appropriately", () => {
       const mockExecutionContext = {} as ExecutionContext;
 
-      // Test with empty context (partial context)
       jest.spyOn(GqlExecutionContext, "create").mockReturnValue({
         getContext: () => ({ req: { ip: "127.0.0.1" }, res: null }),
       } as any);
@@ -238,7 +233,6 @@ describe("GqlThrottlerGuard", () => {
       expect(result.req).toEqual({ ip: "127.0.0.1" });
       expect(result.res).toBeNull();
 
-      // Test with minimal valid context
       jest.spyOn(GqlExecutionContext, "create").mockReturnValue({
         getContext: () => ({
           req: { headers: {} },

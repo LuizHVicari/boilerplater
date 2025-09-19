@@ -58,10 +58,10 @@ describe("CacheTokenInvalidationRepoService", () => {
     };
 
     mockJwtConfig = {
-      accessTokenTtl: 900, // 15 minutes
-      refreshTokenTtl: 604800, // 7 days
-      emailVerificationTokenTtl: 86400, // 24 hours
-      passwordResetTokenTtl: 3600, // 1 hour
+      accessTokenTtl: 900,
+      refreshTokenTtl: 604800,
+      emailVerificationTokenTtl: 86400,
+      passwordResetTokenTtl: 3600,
     };
 
     const cacheService = new ValkeyCacheService(mockCacheConfig);
@@ -105,7 +105,6 @@ describe("CacheTokenInvalidationRepoService", () => {
         type: "access",
       });
 
-      // Invalidate the specific token
       await tokenInvalidationRepo.invalidateToken(token);
 
       // Act
@@ -118,7 +117,7 @@ describe("CacheTokenInvalidationRepoService", () => {
     it("TC003: Should return false when token issued before type invalidation", async () => {
       // Arrange
       const invalidationTime = TimeTestUtils.getCurrentUnixTimestamp();
-      const tokenIssuedBefore = invalidationTime - 10; // 10 seconds before invalidation
+      const tokenIssuedBefore = invalidationTime - 10;
 
       const token = new AuthToken({
         sub: "user-123",
@@ -128,7 +127,6 @@ describe("CacheTokenInvalidationRepoService", () => {
         type: "access",
       });
 
-      // Invalidate all access tokens for user at specific time
       await tokenInvalidationRepo.invalidateAllUserTokens("user-123", "access");
 
       // Act
@@ -139,11 +137,10 @@ describe("CacheTokenInvalidationRepoService", () => {
     });
 
     it("TC004: Should return true when token issued after type invalidation", async () => {
-      // Arrange - First invalidate at current time
+      // Arrange
       const invalidationTime = TimeTestUtils.getCurrentUnixTimestamp();
       await tokenInvalidationRepo.invalidateAllUserTokens("user-123", "access");
 
-      // Wait for next second to ensure token is issued after invalidation
       const tokenIat = await TimeTestUtils.waitForNextSecond();
 
       const token = new AuthToken({
@@ -175,7 +172,6 @@ describe("CacheTokenInvalidationRepoService", () => {
         type: "refresh",
       });
 
-      // Invalidate ALL tokens for user
       await tokenInvalidationRepo.invalidateAllUserTokens("user-123");
 
       // Act
@@ -186,10 +182,9 @@ describe("CacheTokenInvalidationRepoService", () => {
     });
 
     it("TC006: Should return true when token issued after all-tokens invalidation", async () => {
-      // Arrange - First invalidate
+      // Arrange
       await tokenInvalidationRepo.invalidateAllUserTokens("user-123");
 
-      // Wait and create token after invalidation
       const tokenIat = await TimeTestUtils.waitForNextSecond();
 
       const token = new AuthToken({
@@ -211,7 +206,6 @@ describe("CacheTokenInvalidationRepoService", () => {
       // Arrange
       const exactSecond = TimeTestUtils.getCurrentUnixTimestamp();
 
-      // Create token at exact second
       const token = new AuthToken({
         sub: "user-123",
         iat: exactSecond,
@@ -220,14 +214,13 @@ describe("CacheTokenInvalidationRepoService", () => {
         type: "access",
       });
 
-      // Simulate invalidation at the exact same second
       const cacheService = (tokenInvalidationRepo as any).cacheService;
       await cacheService.set("all-user-tokens-invalidation:user-123:access", exactSecond, 900);
 
       // Act
       const result = await tokenInvalidationRepo.verifyTokenValid(token);
 
-      // Assert - Token should be VALID because iat >= invalidationTime (not strictly >)
+      // Assert
       expect(result).toBe(true);
     });
 
@@ -244,7 +237,6 @@ describe("CacheTokenInvalidationRepoService", () => {
         type: "access",
       });
 
-      // Set invalidation at earlier time
       const cacheService = (tokenInvalidationRepo as any).cacheService;
       await cacheService.set("all-user-tokens-invalidation:user-123:access", invalidationTime, 900);
 
@@ -271,7 +263,6 @@ describe("CacheTokenInvalidationRepoService", () => {
         type: "access",
       });
 
-      // Set invalidation at later time
       const cacheService = (tokenInvalidationRepo as any).cacheService;
       await cacheService.set("all-user-tokens-invalidation:user-123:access", invalidationTime, 900);
 
@@ -289,7 +280,6 @@ describe("CacheTokenInvalidationRepoService", () => {
       // Arrange
       const baseTime = TimeTestUtils.getCurrentUnixTimestamp();
 
-      // Create tokens at different times
       const tokenBeforeAll = new AuthToken({
         sub: "user-123",
         iat: baseTime - 20,
@@ -314,7 +304,6 @@ describe("CacheTokenInvalidationRepoService", () => {
         type: "access",
       });
 
-      // Set multiple invalidations
       const cacheService = (tokenInvalidationRepo as any).cacheService;
       await cacheService.set("all-user-tokens-invalidation:user-123:all", baseTime - 15, 900);
       await cacheService.set("all-user-tokens-invalidation:user-123:access", baseTime - 5, 900);
@@ -325,9 +314,9 @@ describe("CacheTokenInvalidationRepoService", () => {
       const resultAfter = await tokenInvalidationRepo.verifyTokenValid(tokenAfter);
 
       // Assert
-      expect(resultBeforeAll).toBe(false); // Before all-tokens invalidation
-      expect(resultBeforeType).toBe(false); // Before type-specific invalidation
-      expect(resultAfter).toBe(true); // After all invalidations
+      expect(resultBeforeAll).toBe(false);
+      expect(resultBeforeType).toBe(false);
+      expect(resultAfter).toBe(true);
     });
   });
 
@@ -372,7 +361,7 @@ describe("CacheTokenInvalidationRepoService", () => {
       await tokenInvalidationRepo.invalidateToken(accessToken);
       await tokenInvalidationRepo.invalidateToken(refreshToken);
 
-      // Assert - Check TTL via Redis client
+      // Assert
       const client = cacheHelper.getClient();
       const accessTtl = await client.ttl("single-token-invalidation:jti-access");
       const refreshTtl = await client.ttl("single-token-invalidation:jti-refresh");
@@ -460,7 +449,7 @@ describe("CacheTokenInvalidationRepoService", () => {
         type: "refresh",
       });
 
-      // Act - Invalidate only access tokens
+      // Act
       await tokenInvalidationRepo.invalidateAllUserTokens("user-123", "access");
 
       // Assert
@@ -468,7 +457,7 @@ describe("CacheTokenInvalidationRepoService", () => {
       const refreshResult = await tokenInvalidationRepo.verifyTokenValid(refreshToken);
 
       expect(accessResult).toBe(false);
-      expect(refreshResult).toBe(true); // Refresh should still be valid
+      expect(refreshResult).toBe(true);
     });
 
     it("TC016: Should set correct TTL based on token type", async () => {
@@ -476,7 +465,7 @@ describe("CacheTokenInvalidationRepoService", () => {
       await tokenInvalidationRepo.invalidateAllUserTokens("user-123", "access");
       await tokenInvalidationRepo.invalidateAllUserTokens("user-123", "refresh");
 
-      // Assert - Check TTL via Redis client
+      // Assert
       const client = cacheHelper.getClient();
       const accessTtl = await client.ttl("all-user-tokens-invalidation:user-123:access");
       const refreshTtl = await client.ttl("all-user-tokens-invalidation:user-123:refresh");
@@ -493,7 +482,7 @@ describe("CacheTokenInvalidationRepoService", () => {
       // Act
       await tokenInvalidationRepo.invalidateAllUserTokens("user-123", "access");
 
-      // Assert - Get invalidation timestamp from cache
+      // Assert
       const client = cacheHelper.getClient();
       const invalidationTimeStr = await client.get("all-user-tokens-invalidation:user-123:access");
       const invalidationTime = Math.floor(Number(invalidationTimeStr));
@@ -505,10 +494,9 @@ describe("CacheTokenInvalidationRepoService", () => {
 
   describe("Integration Tests", () => {
     it("TC018: Should handle combination of different invalidation types", async () => {
-      // Arrange - Complex scenario with multiple invalidations
+      // Arrange
       const baseTime = TimeTestUtils.getCurrentUnixTimestamp();
 
-      // Create various tokens
       const oldToken = new AuthToken({
         sub: "user-123",
         iat: baseTime - 100,
@@ -533,11 +521,10 @@ describe("CacheTokenInvalidationRepoService", () => {
         type: "access",
       });
 
-      // Apply different invalidations at different times
       const cacheService = (tokenInvalidationRepo as any).cacheService;
       await cacheService.set("all-user-tokens-invalidation:user-123:all", baseTime - 75, 3600);
       await cacheService.set("all-user-tokens-invalidation:user-123:access", baseTime - 25, 900);
-      await tokenInvalidationRepo.invalidateToken(mediumToken); // Specific JTI invalidation
+      await tokenInvalidationRepo.invalidateToken(mediumToken);
 
       // Act
       const oldResult = await tokenInvalidationRepo.verifyTokenValid(oldToken);
@@ -545,9 +532,9 @@ describe("CacheTokenInvalidationRepoService", () => {
       const newResult = await tokenInvalidationRepo.verifyTokenValid(newToken);
 
       // Assert
-      expect(oldResult).toBe(false); // Invalid due to all-tokens invalidation
-      expect(mediumResult).toBe(false); // Invalid due to specific JTI invalidation
-      expect(newResult).toBe(true); // Valid - issued after all invalidations
+      expect(oldResult).toBe(false);
+      expect(mediumResult).toBe(false);
+      expect(newResult).toBe(true);
     });
 
     it("TC019: Should handle high volume of invalidation checks efficiently", async () => {
@@ -567,7 +554,7 @@ describe("CacheTokenInvalidationRepoService", () => {
         );
       }
 
-      // Act - Measure performance
+      // Act
       const start = Date.now();
       const results = await Promise.all(
         tokens.map(token => tokenInvalidationRepo.verifyTokenValid(token)),
@@ -576,13 +563,13 @@ describe("CacheTokenInvalidationRepoService", () => {
 
       // Assert
       expect(results).toHaveLength(tokenCount);
-      expect(results.every(result => result === true)).toBe(true); // All should be valid
-      expect(duration).toBeLessThan(5000); // Should complete within 5 seconds
+      expect(results.every(result => result === true)).toBe(true);
+      expect(duration).toBeLessThan(5000);
     });
 
     it("TC020: Should respect TTL and clean up expired invalidation records", async () => {
       // Arrange
-      const shortTtl = 2; // 2 seconds
+      const shortTtl = 2;
       const token = new AuthToken({
         sub: "user-123",
         iat: TimeTestUtils.getUnixTimestampSecondsAgo(10),
@@ -591,18 +578,16 @@ describe("CacheTokenInvalidationRepoService", () => {
         type: "access",
       });
 
-      // Manually set invalidation with short TTL
       const cacheService = (tokenInvalidationRepo as any).cacheService;
       await cacheService.set("single-token-invalidation:jti-ttl-test", "", shortTtl);
 
-      // Assert - Should be invalid immediately
+      // Assert
       const immediateResult = await tokenInvalidationRepo.verifyTokenValid(token);
       expect(immediateResult).toBe(false);
 
-      // Wait for TTL expiration
       await new Promise(resolve => setTimeout(resolve, 2500));
 
-      // Assert - Should be valid after TTL expiration
+      // Assert
       const expiredResult = await tokenInvalidationRepo.verifyTokenValid(token);
       expect(expiredResult).toBe(true);
     }, 10000);

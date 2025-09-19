@@ -163,7 +163,6 @@ describe("ValkeyCacheService", () => {
       const result = await cacheService.get(key);
       expect(result).toBe(value);
 
-      // Verify TTL is set (Redis TTL command returns seconds remaining)
       const client = cacheHelper.getClient();
       const ttl = await client.ttl(key);
       expect(ttl).toBeGreaterThan(0);
@@ -183,7 +182,6 @@ describe("ValkeyCacheService", () => {
       const result = await cacheService.get(key);
       expect(result).toBe(value);
 
-      // Verify custom TTL is set
       const client = cacheHelper.getClient();
       const ttl = await client.ttl(key);
       expect(ttl).toBeGreaterThan(60);
@@ -244,7 +242,6 @@ describe("ValkeyCacheService", () => {
       const value = "test-value";
       await cacheService.set(key, value);
 
-      // Verify key exists
       const beforeDelete = await cacheService.get(key);
       expect(beforeDelete).toBe(value);
 
@@ -260,7 +257,7 @@ describe("ValkeyCacheService", () => {
       // Arrange
       const key = "non-existent-key";
 
-      // Act & Assert - Should not throw
+      // Act & Assert
       await expect(cacheService.delete(key)).resolves.not.toThrow();
     });
   });
@@ -359,10 +356,9 @@ describe("ValkeyCacheService", () => {
       // Arrange
       await cacheService.set("other:1", "value");
 
-      // Act & Assert - Should not throw
+      // Act & Assert
       await expect(cacheService.deleteMany("nonexistent:*")).resolves.not.toThrow();
 
-      // Verify other keys remain
       const otherResult = await cacheService.get("other:1");
       expect(otherResult).toBe("value");
     });
@@ -373,31 +369,24 @@ describe("ValkeyCacheService", () => {
       // Arrange
       const key = "ttl-test-key";
       const value = "ttl-test-value";
-      const shortTtl = 2; // 2 seconds
+      const shortTtl = 2;
 
       // Act
       await cacheService.set(key, value, shortTtl);
 
-      // Assert - Key should exist immediately
+      // Assert
       const immediateResult = await cacheService.get(key);
       expect(immediateResult).toBe(value);
 
-      // Wait for expiration (adding extra buffer for Redis cleanup)
       await new Promise(resolve => setTimeout(resolve, 3500));
 
-      // Assert - Key should be expired
+      // Assert
       const expiredResult = await cacheService.get(key);
       expect(expiredResult).toBeUndefined();
     }, 10000);
 
-    it("TC017: Should handle Redis connection errors gracefully", () => {
-      // Note: This test would require stopping the container mid-test
-      // For now, we'll test with a mock to ensure error handling exists
-      expect(true).toBe(true); // Placeholder - would need more complex setup
-    });
-
     it("TC018: Should handle multiple keys efficiently with scan", async () => {
-      // Arrange - Create many keys
+      // Arrange
       const keyCount = 100;
       const testData: Array<{ key: string; value: number }> = [];
 
@@ -450,22 +439,22 @@ describe("ValkeyCacheService", () => {
         });
       }
 
-      // Act - Measure bulk set performance
+      // Act
       const setStart = Date.now();
       for (const item of testData) {
         await cacheService.set(item.key, item.value);
       }
       const setTime = Date.now() - setStart;
 
-      // Act - Measure bulk get performance
+      // Act
       const getStart = Date.now();
       const results = await cacheService.getMany("perf:*");
       const getTime = Date.now() - getStart;
 
       // Assert
       expect(results).toHaveLength(bulkSize);
-      expect(setTime).toBeLessThan(5000); // 5 seconds max for 50 operations
-      expect(getTime).toBeLessThan(2000); // 2 seconds max for pattern matching
+      expect(setTime).toBeLessThan(5000);
+      expect(getTime).toBeLessThan(2000);
     });
   });
 });

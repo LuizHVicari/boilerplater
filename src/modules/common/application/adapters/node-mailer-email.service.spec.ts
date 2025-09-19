@@ -176,7 +176,7 @@ describe("NodeMailerEmailService", () => {
       expect(callArgs.subject).toBe("Original Subject");
       expect(callArgs.template).toBe("email-verification");
       expect(callArgs.context).toEqual(context);
-      expect(callArgs.context).toBe(context); // Same reference
+      expect(callArgs.context).toBe(context);
     });
 
     it("TC006: Should propagate MailerService errors", async () => {

@@ -73,7 +73,7 @@ export class AuthResolver {
 
   @Mutation(() => SignUpResponse)
   @UseGuards(GqlThrottlerGuard)
-  @Throttle({ default: { limit: 2, ttl: 60000 } }) // 2 signups per minute
+  @Throttle({ default: { limit: 2, ttl: 60000 } })
   async signUp(@Args("input") input: SignUpInput): Promise<SignUpResponse> {
     const { id, email, firstName, lastName, createdAt, updatedAt } = await this.commandBus.execute(
       new SignUpCommand(input.email, input.password, input.firstName, input.lastName),
@@ -116,7 +116,7 @@ export class AuthResolver {
 
   @Mutation(() => ForgotPasswordResponse)
   @UseGuards(GqlThrottlerGuard)
-  @Throttle({ default: { limit: 3, ttl: 300000 } }) // 3 forgot password attempts per 5 minutes
+  @Throttle({ default: { limit: 3, ttl: 300000 } })
   async forgotPassword(@Args("input") input: ForgotPasswordInput): Promise<ForgotPasswordResponse> {
     const { email } = await this.commandBus.execute(new ForgotPasswordCommand(input.email));
 
@@ -127,7 +127,7 @@ export class AuthResolver {
 
   @Mutation(() => ResetPasswordResponse)
   @UseGuards(GqlThrottlerGuard)
-  @Throttle({ default: { limit: 3, ttl: 60000 } }) // 3 reset attempts per minute
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   async resetPassword(@Args("input") input: ResetPasswordInput): Promise<ResetPasswordResponse> {
     const { email } = await this.commandBus.execute(
       new ResetPasswordCommand(input.token, input.password),
@@ -139,7 +139,7 @@ export class AuthResolver {
   }
 
   @UseGuards(GqlThrottlerGuard)
-  @Throttle({ default: { limit: 5, ttl: 300000 } }) // 5 login attempts per 5 minutes - MOST RESTRICTIVE
+  @Throttle({ default: { limit: 5, ttl: 300000 } })
   @Mutation(() => SignInResponse)
   async signIn(
     @Args("input") input: SignInInput,

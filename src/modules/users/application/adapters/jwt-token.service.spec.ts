@@ -54,10 +54,10 @@ describe("JWTTokenService", () => {
       refreshSecret: "refresh-secret-32-chars-long-test",
       emailVerificationSecret: "email-secret-32-chars-long-test",
       passwordResetSecret: "password-secret-32-chars-long-test",
-      accessTokenTtl: 900, // 15 minutes
-      refreshTokenTtl: 604800, // 7 days
-      emailVerificationTokenTtl: 86400, // 24 hours
-      passwordResetTokenTtl: 3600, // 1 hour
+      accessTokenTtl: 900,
+      refreshTokenTtl: 604800,
+      emailVerificationTokenTtl: 86400,
+      passwordResetTokenTtl: 3600,
     };
   });
 
@@ -284,7 +284,6 @@ describe("JWTTokenService", () => {
       expect(call1Args.jti).toBeDefined();
       expect(call2Args.jti).toBeDefined();
       expect(call1Args.jti).not.toBe(call2Args.jti);
-      // UUID format check
       expect(call1Args.jti).toMatch(
         /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
       );
@@ -411,7 +410,6 @@ describe("JWTTokenService", () => {
         iat: 1000000,
         exp: 1000900,
         jti: "jti-123",
-        // type is missing
       };
       mockJwtService.decode.mockReturnValue(mockPayload);
 
@@ -517,10 +515,8 @@ describe("JWTTokenService", () => {
         emailConfirmed: true,
       });
 
-      // Mock generateToken flow
       mockJwtService.signAsync.mockResolvedValue("generated-jwt-token");
 
-      // Mock verifyToken flow
       const expectedPayload = {
         sub: "integration-user",
         iat: expect.any(Number),
@@ -592,7 +588,6 @@ describe("JWTTokenService", () => {
       expect(call2Args.sub).toBe("user-two");
       expect(call2Args.type).toBe("refresh");
 
-      // Different secrets used
       expect(mockJwtService.signAsync.mock.calls[0]?.[1]?.secret).toBe(
         "access-secret-32-chars-long-test",
       );

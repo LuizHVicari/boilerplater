@@ -45,7 +45,6 @@ import {
 } from "../dto/auth.input";
 import { AuthResolver } from "./auth.resolver";
 
-// Mock the shared utils
 jest.mock("@shared/utils/token-extraction", () => ({
   extractTokensFromContext: jest.fn(),
   clearRefreshTokenCookie: jest.fn(),
@@ -72,7 +71,6 @@ describe("AuthResolver", () => {
     commandBus = unitRef.get(CommandBus);
     cookiesSettings = unitRef.get(cookiesConfig.KEY);
 
-    // Setup mock contexts
     mockGraphQLContext = {
       req: {
         headers: { authorization: "Bearer access-token-123" },
@@ -114,7 +112,6 @@ describe("AuthResolver", () => {
       },
     };
 
-    // Setup default cookies settings
     cookiesSettings.secure = false;
     cookiesSettings.refreshTokenMaxAge = 604800000;
   });

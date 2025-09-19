@@ -133,7 +133,7 @@ describe("AuthValidationService", () => {
         id: "user-123",
         email: "test@example.com",
         password: "$2b$10$hashedPassword123456789",
-        active: false, // User is inactive
+        active: false,
         emailConfirmed: true,
       });
 
@@ -162,7 +162,7 @@ describe("AuthValidationService", () => {
         email: "test@example.com",
         password: "$2b$10$hashedPassword123456789",
         active: true,
-        emailConfirmed: false, // Email not confirmed
+        emailConfirmed: false,
       });
 
       mockUserQueryRepo.findUserById.mockResolvedValue(unconfirmedUser);
@@ -179,7 +179,7 @@ describe("AuthValidationService", () => {
       // Arrange
       const authToken = new AuthToken({
         sub: "user-123",
-        iat: 1000000, // Token issued at this time
+        iat: 1000000,
         exp: 1000900,
         jti: "jti-123",
         type: "access",
@@ -191,7 +191,7 @@ describe("AuthValidationService", () => {
         password: "$2b$10$hashedPassword123456789",
         active: true,
         emailConfirmed: true,
-        lastCredentialInvalidation: new Date(1000100 * 1000), // Invalidated after token was issued
+        lastCredentialInvalidation: new Date(1000100 * 1000),
       });
 
       mockUserQueryRepo.findUserById.mockResolvedValue(user);
@@ -297,14 +297,13 @@ describe("AuthValidationService", () => {
         iat: 1000000,
         exp: 1000900,
         jti: "jti-123",
-        type: "email-confirmation", // Not valid for authentication
+        type: "email-confirmation",
       });
 
       // Act & Assert
       await expect(authValidationService.validateAuthToken(emailToken)).rejects.toThrow(
         InvalidCredentialsError,
       );
-      // Should not proceed to user lookup
       expect(mockUserQueryRepo.findUserById).not.toHaveBeenCalled();
     });
 
@@ -322,7 +321,7 @@ describe("AuthValidationService", () => {
         id: "user-123",
         email: "test@example.com",
         password: "$2b$10$hashedPassword123456789",
-        active: false, // Cannot authenticate
+        active: false,
         emailConfirmed: false,
       });
 
@@ -332,7 +331,6 @@ describe("AuthValidationService", () => {
       await expect(authValidationService.validateAuthToken(authToken)).rejects.toThrow(
         InvalidCredentialsError,
       );
-      // Should not proceed to token invalidation check
       expect(mockTokenInvalidationRepo.verifyTokenValid).not.toHaveBeenCalled();
     });
 
@@ -360,12 +358,12 @@ describe("AuthValidationService", () => {
       // Act
       const result = await authValidationService.validateAuthToken(authToken);
 
-      // Assert - Verify order of calls
+      // Assert
       const calls = [
         mockUserQueryRepo.findUserById.mock.invocationCallOrder[0],
         mockTokenInvalidationRepo.verifyTokenValid.mock.invocationCallOrder[0],
       ];
-      expect(calls[0]).toBeLessThan(calls[1]); // User lookup should happen before token validation
+      expect(calls[0]).toBeLessThan(calls[1]);
       expect(result).toBe(user);
     });
 
@@ -385,7 +383,6 @@ describe("AuthValidationService", () => {
         password: "$2b$10$hashedPassword123456789",
         active: true,
         emailConfirmed: true,
-        // No lastCredentialInvalidation provided
       });
 
       mockUserQueryRepo.findUserById.mockResolvedValue(user);
@@ -416,7 +413,7 @@ describe("AuthValidationService", () => {
         password: "$2b$10$hashedPassword123456789",
         active: true,
         emailConfirmed: true,
-        lastCredentialInvalidation: new Date(tokenIat * 1000), // Invalidated at exact same time
+        lastCredentialInvalidation: new Date(tokenIat * 1000),
       });
 
       mockUserQueryRepo.findUserById.mockResolvedValue(user);
@@ -425,7 +422,7 @@ describe("AuthValidationService", () => {
       // Act
       const result = await authValidationService.validateAuthToken(authToken);
 
-      // Assert - Should succeed because invalidation is not > token iat
+      // Assert
       expect(result).toBe(user);
       expect(mockTokenInvalidationRepo.verifyTokenValid).toHaveBeenCalledWith(authToken);
     });

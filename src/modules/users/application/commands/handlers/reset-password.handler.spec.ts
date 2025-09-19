@@ -256,7 +256,7 @@ describe("ResetPasswordHandler", () => {
         password: "$2b$10$hashedpassword123456789012345678901234567890123456789",
         firstName: "John",
         lastName: "Doe",
-        active: false, // User is not active
+        active: false,
         emailConfirmed: true,
       });
 
@@ -292,7 +292,7 @@ describe("ResetPasswordHandler", () => {
         firstName: "John",
         lastName: "Doe",
         active: true,
-        emailConfirmed: false, // Email is not confirmed
+        emailConfirmed: false,
       });
 
       tokenService.verifyToken.mockResolvedValue(authToken);

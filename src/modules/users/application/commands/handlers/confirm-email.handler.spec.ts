@@ -45,7 +45,6 @@ describe("ConfirmEmailHandler", () => {
     userQueryRepository = unitRef.get(USER_QUERY_REPOSITORY);
     unitOfWork = unitRef.get(UNIT_OF_WORK);
 
-    // Mock repository context with updateUser method
     mockRepositoryContext = {
       userCommandRepository: {
         updateUser: jest.fn(),
@@ -53,7 +52,6 @@ describe("ConfirmEmailHandler", () => {
       cancel: jest.fn(),
     };
 
-    // Setup default mocks
     unitOfWork.execute.mockImplementation(async callback => {
       return callback(mockRepositoryContext);
     });
@@ -122,7 +120,6 @@ describe("ConfirmEmailHandler", () => {
       // Act & Assert
       await expect(confirmEmailHandler.execute(command)).rejects.toThrow("Invalid token");
 
-      // Verify that no subsequent operations occur
       expect(tokenInvalidationRepo.verifyTokenValid).not.toHaveBeenCalled();
       expect(userQueryRepository.findUserById).not.toHaveBeenCalled();
       expect(unitOfWork.execute).not.toHaveBeenCalled();
@@ -170,7 +167,6 @@ describe("ConfirmEmailHandler", () => {
         "Token has been invalidated",
       );
 
-      // Verify that no subsequent operations occur
       expect(userQueryRepository.findUserById).not.toHaveBeenCalled();
       expect(unitOfWork.execute).not.toHaveBeenCalled();
     });
@@ -197,7 +193,6 @@ describe("ConfirmEmailHandler", () => {
       // Act & Assert
       await expect(confirmEmailHandler.execute(command)).rejects.toThrow("Entity not found");
 
-      // Verify that no user update occurs
       expect(unitOfWork.execute).not.toHaveBeenCalled();
     });
   });
@@ -223,7 +218,7 @@ describe("ConfirmEmailHandler", () => {
         firstName: "John",
         lastName: "Doe",
         active: true,
-        emailConfirmed: true, // Already confirmed
+        emailConfirmed: true,
       });
 
       tokenService.verifyToken.mockResolvedValue(mockTokenPayload);
@@ -233,7 +228,6 @@ describe("ConfirmEmailHandler", () => {
       // Act & Assert
       await expect(confirmEmailHandler.execute(command)).rejects.toThrow("Already processed");
 
-      // Verify that no user update occurs
       expect(unitOfWork.execute).not.toHaveBeenCalled();
     });
   });
@@ -273,7 +267,6 @@ describe("ConfirmEmailHandler", () => {
       expect(unitOfWork.execute).toHaveBeenCalledWith(expect.any(Function));
       expect(unitOfWork.execute).toHaveBeenCalledTimes(1);
 
-      // Verify that repository operations are called within the transaction context
       expect(mockRepositoryContext.userCommandRepository.updateUser).toHaveBeenCalledWith(mockUser);
       expect(mockUser.emailConfirmed).toBe(true);
     });

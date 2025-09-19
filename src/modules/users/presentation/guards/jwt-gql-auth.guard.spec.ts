@@ -14,7 +14,6 @@ import type { AuthenticatedHttpRequest } from "@shared/types/http.types";
 
 import { GqlJwtAuthGuard } from "./jwt-gql-auth.guard";
 
-// Mock GqlExecutionContext
 jest.mock("@nestjs/graphql", () => ({
   GqlExecutionContext: {
     create: jest.fn(),

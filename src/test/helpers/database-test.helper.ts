@@ -40,7 +40,6 @@ export class DatabaseTestHelper {
 
     this.db = drizzle(this.client);
 
-    // Run migrations to set up schema
     await this.runMigrations();
 
     return {
@@ -58,7 +57,6 @@ export class DatabaseTestHelper {
       throw new Error("Database not initialized. Call startContainer() first.");
     }
 
-    // Use Drizzle migrations - should work with the real migration files
     await migrate(this.db, { migrationsFolder: "./drizzle" });
   }
 
@@ -67,7 +65,6 @@ export class DatabaseTestHelper {
       throw new Error("Database client not initialized.");
     }
 
-    // Clear all data from auth.user table (the real table name)
     await this.client.query("TRUNCATE TABLE auth.user CASCADE");
   }
 

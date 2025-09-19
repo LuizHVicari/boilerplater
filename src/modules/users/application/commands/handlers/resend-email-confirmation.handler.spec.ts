@@ -51,7 +51,6 @@ describe("ResendEmailConfirmationHandler", () => {
     tokenService = unitRef.get(TOKEN_SERVICE);
     emailConfigService = unitRef.get(EMAIL_CONFIG_SERVICE);
 
-    // Setup EmailConfigService mock values
     emailConfigService.appName = "My App";
     emailConfigService.supportEmail = "Lx0dR@example.com";
     emailConfigService.baseUrl = "https://example.com";
@@ -122,7 +121,6 @@ describe("ResendEmailConfirmationHandler", () => {
         UserNotFoundError,
       );
 
-      // Verify that no subsequent operations occur
       expect(tokenInvalidationRepo.invalidateAllUserTokens).not.toHaveBeenCalled();
       expect(tokenService.generateToken).not.toHaveBeenCalled();
       expect(emailService.sendEmail).not.toHaveBeenCalled();
@@ -141,7 +139,7 @@ describe("ResendEmailConfirmationHandler", () => {
         firstName: "John",
         lastName: "Doe",
         active: true,
-        emailConfirmed: true, // Already confirmed
+        emailConfirmed: true,
       });
 
       userQueryRepository.findUserByEmail.mockResolvedValue(mockUser);
@@ -151,7 +149,6 @@ describe("ResendEmailConfirmationHandler", () => {
         EmailAlreadyConfirmedError,
       );
 
-      // Verify that no subsequent operations occur
       expect(tokenInvalidationRepo.invalidateAllUserTokens).not.toHaveBeenCalled();
       expect(tokenService.generateToken).not.toHaveBeenCalled();
       expect(emailService.sendEmail).not.toHaveBeenCalled();
@@ -190,7 +187,6 @@ describe("ResendEmailConfirmationHandler", () => {
       );
       expect(tokenService.generateToken).toHaveBeenCalledWith(mockUser, "email-confirmation");
 
-      // Verify order: token invalidation should happen before token generation
       const invalidateCall =
         tokenInvalidationRepo.invalidateAllUserTokens.mock.invocationCallOrder[0];
       const generateCall = tokenService.generateToken.mock.invocationCallOrder[0];
@@ -304,7 +300,6 @@ describe("ResendEmailConfirmationHandler", () => {
         "Token generation failed",
       );
 
-      // Verify that email service is not called
       expect(emailService.sendEmail).not.toHaveBeenCalled();
     });
   });
@@ -337,7 +332,6 @@ describe("ResendEmailConfirmationHandler", () => {
         "Email service unavailable",
       );
 
-      // Verify that token invalidation and generation still occurred
       expect(tokenInvalidationRepo.invalidateAllUserTokens).toHaveBeenCalled();
       expect(tokenService.generateToken).toHaveBeenCalled();
     });

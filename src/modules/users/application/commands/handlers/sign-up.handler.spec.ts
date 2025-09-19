@@ -55,7 +55,6 @@ describe("SignUpHandler", () => {
     tokenInvalidationRepo = unitRef.get(TOKEN_INVALIDATION_REPOSITORY);
     emailConfigService = unitRef.get(EMAIL_CONFIG_SERVICE);
 
-    // Mock repository context with createUser method
     mockRepositoryContext = {
       userCommandRepository: {
         createUser: jest.fn(),
@@ -63,12 +62,10 @@ describe("SignUpHandler", () => {
       cancel: jest.fn(),
     };
 
-    // Setup default mocks
     unitOfWork.execute.mockImplementation(async callback => {
       return callback(mockRepositoryContext);
     });
 
-    // Setup EmailConfigService mock values
     emailConfigService.appName = "My App";
     emailConfigService.supportEmail = "Lx0dR@example.com";
     emailConfigService.baseUrl = "https://example.com";
@@ -191,7 +188,6 @@ describe("SignUpHandler", () => {
       // Act & Assert
       await expect(signUpHandler.execute(signUpCommand)).rejects.toThrow("Entity already exists");
 
-      // Verify that no user creation or email sending occurs
       expect(mockRepositoryContext.userCommandRepository.createUser).not.toHaveBeenCalled();
       expect(tokenInvalidationRepo.invalidateAllUserTokens).not.toHaveBeenCalled();
       expect(tokenService.generateToken).not.toHaveBeenCalled();
@@ -211,7 +207,6 @@ describe("SignUpHandler", () => {
       // Act & Assert
       await expect(signUpHandler.execute(signUpCommand)).rejects.toThrow("Password hashing failed");
 
-      // Verify that no subsequent operations occur
       expect(mockRepositoryContext.userCommandRepository.createUser).not.toHaveBeenCalled();
       expect(tokenInvalidationRepo.invalidateAllUserTokens).not.toHaveBeenCalled();
       expect(tokenService.generateToken).not.toHaveBeenCalled();
@@ -233,9 +228,7 @@ describe("SignUpHandler", () => {
       // Act & Assert
       await expect(signUpHandler.execute(signUpCommand)).rejects.toThrow("Transaction failed");
 
-      // Verify that transaction was attempted
       expect(unitOfWork.execute).toHaveBeenCalled();
-      // But email service should not be called due to transaction failure
       expect(emailService.sendEmail).not.toHaveBeenCalled();
     });
   });
@@ -267,7 +260,6 @@ describe("SignUpHandler", () => {
         "Email service unavailable",
       );
 
-      // Verify that user creation and token generation still occurred
       expect(mockRepositoryContext.userCommandRepository.createUser).toHaveBeenCalled();
       expect(tokenInvalidationRepo.invalidateAllUserTokens).toHaveBeenCalled();
       expect(tokenService.generateToken).toHaveBeenCalled();
@@ -303,7 +295,6 @@ describe("SignUpHandler", () => {
       expect(unitOfWork.execute).toHaveBeenCalledWith(expect.any(Function));
       expect(unitOfWork.execute).toHaveBeenCalledTimes(1);
 
-      // Verify that repository operations are called within the transaction context
       expect(mockRepositoryContext.userCommandRepository.createUser).toHaveBeenCalledWith(
         expect.any(UserModel),
       );

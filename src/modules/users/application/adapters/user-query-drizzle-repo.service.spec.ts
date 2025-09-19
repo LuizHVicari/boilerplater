@@ -108,7 +108,7 @@ describe("UserQueryDrizzleRepository", () => {
     const { db } = await databaseHelper.startContainer();
 
     userQueryRepo = new UserQueryDrizzleRepository(db);
-    userCommandRepo = new UserCommandDrizzleRepo(db); // For test data setup
+    userCommandRepo = new UserCommandDrizzleRepo(db);
   }, 60000);
 
   afterAll(async () => {
@@ -119,7 +119,6 @@ describe("UserQueryDrizzleRepository", () => {
     await databaseHelper.clearDatabase();
   });
 
-  // Test data setup helpers
   const createTestUser = async (overrides: Partial<any> = {}) => {
     const defaultUserData = {
       email: `user-${Date.now()}-${Math.random()}@example.com`,
@@ -323,14 +322,13 @@ describe("UserQueryDrizzleRepository", () => {
       const result = await userQueryRepo.findUsers({ limit: 3, offset: 2 });
 
       // Assert
-      expect(result.data).toHaveLength(3); // Limited to 3
-      expect(result.count).toBe(10); // Total count should be 10
+      expect(result.data).toHaveLength(3);
+      expect(result.count).toBe(10);
     });
   });
 
   describe("findUsers - Pagination", () => {
     beforeEach(async () => {
-      // Create 10 test users for pagination testing
       for (let i = 0; i < 10; i++) {
         await createTestUser({
           email: `pagination${i}@example.com`,
@@ -344,7 +342,7 @@ describe("UserQueryDrizzleRepository", () => {
       const result = await userQueryRepo.findUsers({});
 
       // Assert
-      expect(result.data).toHaveLength(10); // Should return all users
+      expect(result.data).toHaveLength(10);
       expect(result.count).toBe(10);
     });
 
@@ -355,7 +353,6 @@ describe("UserQueryDrizzleRepository", () => {
       // Assert
       expect(result.data).toHaveLength(3);
       expect(result.count).toBe(10);
-      // Should be first 3 users (ordered by createdAt)
     });
 
     it("TC014: Should apply offset without limit (skip N records)", async () => {
@@ -363,7 +360,7 @@ describe("UserQueryDrizzleRepository", () => {
       const result = await userQueryRepo.findUsers({ offset: 3 });
 
       // Assert
-      expect(result.data).toHaveLength(7); // 10 - 3 = 7
+      expect(result.data).toHaveLength(7);
       expect(result.count).toBe(10);
     });
 
@@ -453,7 +450,7 @@ describe("UserQueryDrizzleRepository", () => {
     });
 
     it("TC022: Should search case-insensitively", async () => {
-      // Arrange - Create a user with unique case-sensitive name
+      // Arrange
       const uniqueName = `CaseTest${Date.now()}`;
       await createTestUser({
         firstName: uniqueName,
@@ -461,11 +458,11 @@ describe("UserQueryDrizzleRepository", () => {
         email: `${uniqueName.toLowerCase()}@example.com`,
       });
 
-      // Act - Search with different case
+      // Act
       const lowerResult = await userQueryRepo.findUsers({ search: uniqueName.toLowerCase() });
       const upperResult = await userQueryRepo.findUsers({ search: uniqueName.toUpperCase() });
 
-      // Assert - Both searches should find the user (case insensitive)
+      // Assert
       expect(lowerResult.data.length).toBeGreaterThanOrEqual(1);
       expect(upperResult.data.length).toBeGreaterThanOrEqual(1);
       expect(
@@ -484,7 +481,7 @@ describe("UserQueryDrizzleRepository", () => {
     });
 
     it("TC024: Should find user when search matches multiple fields", async () => {
-      // Act - Search for "john" which appears in both firstName and email
+      // Act
       const result = await userQueryRepo.findUsers({ search: "john" });
 
       // Assert
@@ -574,7 +571,7 @@ describe("UserQueryDrizzleRepository", () => {
     });
 
     it("TC030: Should filter users by inviter ID", async () => {
-      // Arrange - Get the inviterId from one of the created users
+      // Arrange
       const allUsers = await userQueryRepo.findUsers({});
       const userWithInviter = allUsers.data.find(user => user.invitedById);
       const inviterId = userWithInviter?.invitedById;
@@ -583,7 +580,7 @@ describe("UserQueryDrizzleRepository", () => {
       const result = await userQueryRepo.findUsers({ invitedById: inviterId });
 
       // Assert
-      expect(result.data).toHaveLength(2); // Alice and Charlie
+      expect(result.data).toHaveLength(2);
       expect(result.data.every(user => user.invitedById === inviterId)).toBe(true);
     });
 
@@ -608,14 +605,11 @@ describe("UserQueryDrizzleRepository", () => {
     let user3: UserModel;
 
     beforeEach(async () => {
-      // Create users with known timestamps
       user1 = await createTestUser({ email: "user1@example.com" });
 
-      // Wait a bit and create second user
       await new Promise(resolve => setTimeout(resolve, 100));
       user2 = await createTestUser({ email: "user2@example.com" });
 
-      // Wait a bit and create third user
       await new Promise(resolve => setTimeout(resolve, 100));
       user3 = await createTestUser({ email: "user3@example.com" });
     });
@@ -628,7 +622,7 @@ describe("UserQueryDrizzleRepository", () => {
       const result = await userQueryRepo.findUsers({ createdAtGte: cutoffDate });
 
       // Assert
-      expect(result.data.length).toBeGreaterThanOrEqual(2); // Should include user2 and user3
+      expect(result.data.length).toBeGreaterThanOrEqual(2);
       expect(result.data.every(user => user.createdAt >= cutoffDate)).toBe(true);
     });
 
@@ -640,7 +634,7 @@ describe("UserQueryDrizzleRepository", () => {
       const result = await userQueryRepo.findUsers({ createdAtLte: cutoffDate });
 
       // Assert
-      expect(result.data.length).toBeGreaterThanOrEqual(2); // Should include user1 and user2
+      expect(result.data.length).toBeGreaterThanOrEqual(2);
       expect(result.data.every(user => user.createdAt <= cutoffDate)).toBe(true);
     });
 
@@ -661,7 +655,7 @@ describe("UserQueryDrizzleRepository", () => {
     });
 
     it("TC035: Should filter users updated on or after date", async () => {
-      // Arrange - Update user2 to change its updatedAt
+      // Arrange
       const updatedUser2 = new UserModel({
         id: user2.id,
         email: user2.email,
@@ -696,7 +690,7 @@ describe("UserQueryDrizzleRepository", () => {
       const result = await userQueryRepo.findUsers({ updatedAtLte: pastDate });
 
       // Assert
-      expect(result.data).toHaveLength(0); // All users created recently
+      expect(result.data).toHaveLength(0);
     });
 
     it("TC037: Should filter users within update date range", async () => {
@@ -711,7 +705,7 @@ describe("UserQueryDrizzleRepository", () => {
       });
 
       // Assert
-      expect(result.data).toHaveLength(3); // All users updated recently
+      expect(result.data).toHaveLength(3);
     });
 
     it("TC038: Should combine created/updated date filters", async () => {
@@ -725,7 +719,7 @@ describe("UserQueryDrizzleRepository", () => {
       });
 
       // Assert
-      expect(result.data).toHaveLength(3); // All users are recent
+      expect(result.data).toHaveLength(3);
     });
   });
 
@@ -733,7 +727,6 @@ describe("UserQueryDrizzleRepository", () => {
     let uniquePrefix: string;
 
     beforeEach(async () => {
-      // Use unique prefix to avoid cross-contamination
       uniquePrefix = `test${Date.now()}`;
 
       await createTestUser({
@@ -830,11 +823,11 @@ describe("UserQueryDrizzleRepository", () => {
 
       // Assert
       expect(result.data).toHaveLength(1);
-      expect(result.count).toBe(2); // Total matching unique search term
+      expect(result.count).toBe(2);
     });
 
     it("TC044: Should handle realistic complex query", async () => {
-      // Arrange - Complex real-world scenario
+      // Arrange
       const inviterId = uuidv7();
       await createTestUser({
         firstName: "Admin",
@@ -942,7 +935,7 @@ describe("UserQueryDrizzleRepository", () => {
       for (let i = 0; i < 7; i++) {
         await createTestUser({
           email: `count${i}@example.com`,
-          active: i % 2 === 0, // Alternating active/inactive
+          active: i % 2 === 0,
         });
       }
 
@@ -980,7 +973,7 @@ describe("UserQueryDrizzleRepository", () => {
         await Promise.all(promises);
       }
 
-      // Act - Measure performance
+      // Act
       const start = Date.now();
       const result = await userQueryRepo.findUsers({
         active: true,
@@ -991,8 +984,8 @@ describe("UserQueryDrizzleRepository", () => {
 
       // Assert
       expect(result.data).toHaveLength(20);
-      expect(result.count).toBeGreaterThan(30); // ~33% of 100 users should be active
-      expect(duration).toBeLessThan(1000); // Should complete within 1 second
+      expect(result.count).toBeGreaterThan(30);
+      expect(duration).toBeLessThan(1000);
     }, 30000);
 
     it("TC050: Should handle multiple simultaneous queries correctly", async () => {
@@ -1005,7 +998,7 @@ describe("UserQueryDrizzleRepository", () => {
         });
       }
 
-      // Act - Run multiple queries simultaneously
+      // Act
       const queries = [
         userQueryRepo.findUsers({ active: true }),
         userQueryRepo.findUsers({ active: false }),
@@ -1030,10 +1023,10 @@ describe("UserQueryDrizzleRepository", () => {
       const uniqueEmail = `unique${Date.now()}@example.com`;
       await createTestUser({ email: uniqueEmail });
 
-      // Act - Try to create duplicate email (should fail at database level)
+      // Act
       await expect(createTestUser({ email: uniqueEmail })).rejects.toThrow();
 
-      // Act - Query should still work correctly
+      // Act
       const result = await userQueryRepo.findUserByEmail(uniqueEmail);
 
       // Assert
@@ -1050,14 +1043,14 @@ describe("UserQueryDrizzleRepository", () => {
         });
       }
 
-      // Act - Query with pagination should not load all records
+      // Act
       const smallResult = await userQueryRepo.findUsers({ limit: 5 });
       const largeResult = await userQueryRepo.findUsers({ limit: 40 });
 
       // Assert
       expect(smallResult.data).toHaveLength(5);
       expect(largeResult.data).toHaveLength(40);
-      expect(smallResult.count).toBe(largeResult.count); // Same total count
+      expect(smallResult.count).toBe(largeResult.count);
       expect(smallResult.count).toBe(50);
     });
   });

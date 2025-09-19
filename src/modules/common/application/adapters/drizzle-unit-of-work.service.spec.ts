@@ -18,7 +18,6 @@ import { DatabaseTestHelper } from "src/test/helpers/database-test.helper";
 
 import { RepositoryContext, UnitOfWork } from "../ports/unit-of-work.service";
 
-// Custom UnitOfWork for testing that uses our test database
 class TestDrizzleUnitOfWork implements UnitOfWork {
   constructor(private readonly testDb: NodePgDatabase) {}
 
@@ -65,16 +64,13 @@ describe("DrizzleUnitOfWork - Integration Tests", () => {
         emailConfirmed: false,
       });
 
-      // Execute work that should succeed
       const result = await unitOfWork.execute(async (ctx: RepositoryContext) => {
         await ctx.userCommandRepository.createUser(testUser);
         return "transaction-success";
       });
 
-      // Verify transaction succeeded
       expect(result).toBe("transaction-success");
 
-      // Verify data was persisted
       const savedUsers = await testDb
         .select()
         .from(usersTable)
@@ -92,7 +88,6 @@ describe("DrizzleUnitOfWork - Integration Tests", () => {
         emailConfirmed: false,
       });
 
-      // Execute work that should fail
       await expect(
         unitOfWork.execute(async (ctx: RepositoryContext) => {
           await ctx.userCommandRepository.createUser(testUser);
@@ -100,7 +95,6 @@ describe("DrizzleUnitOfWork - Integration Tests", () => {
         }),
       ).rejects.toThrow("Intentional failure after user creation");
 
-      // Verify data was NOT persisted
       const savedUsers = await testDb
         .select()
         .from(usersTable)
@@ -116,16 +110,14 @@ describe("DrizzleUnitOfWork - Integration Tests", () => {
         emailConfirmed: false,
       });
 
-      // Execute work that calls cancel - should throw rollback error
       await expect(
         unitOfWork.execute(async (ctx: RepositoryContext) => {
           await ctx.userCommandRepository.createUser(testUser);
-          await ctx.cancel(); // Manual rollback - this throws
+          await ctx.cancel();
           return "should-not-reach";
         }),
       ).rejects.toThrow("Rollback");
 
-      // Verify data was NOT persisted
       const savedUsers = await testDb
         .select()
         .from(usersTable)
@@ -148,12 +140,10 @@ describe("DrizzleUnitOfWork - Integration Tests", () => {
         emailConfirmed: true,
       });
 
-      // Execute multiple operations in one transaction
       const result = await unitOfWork.execute(async (ctx: RepositoryContext) => {
         await ctx.userCommandRepository.createUser(user1);
         await ctx.userCommandRepository.createUser(user2);
 
-        // Update user1
         user1.activate();
         user1.confirmEmail();
         await ctx.userCommandRepository.updateUser(user1);
@@ -163,11 +153,9 @@ describe("DrizzleUnitOfWork - Integration Tests", () => {
 
       expect(result).toBe("multi-ops-success");
 
-      // Verify both users were persisted
       const totalUsers = await testDb.select({ count: count() }).from(usersTable);
       expect(totalUsers[0].count).toBe(2);
 
-      // Verify user1 updates were persisted
       const user1Data = await testDb
         .select()
         .from(usersTable)
@@ -191,16 +179,15 @@ describe("DrizzleUnitOfWork - Integration Tests", () => {
         emailConfirmed: false,
       });
 
-      // Execute concurrent transactions
       const [result1, result2] = await Promise.all([
         unitOfWork.execute(async (ctx: RepositoryContext) => {
           await ctx.userCommandRepository.createUser(user1);
-          await new Promise(resolve => setTimeout(resolve, 10)); // Small delay
+          await new Promise(resolve => setTimeout(resolve, 10));
           return "concurrent-1";
         }),
         unitOfWork.execute(async (ctx: RepositoryContext) => {
           await ctx.userCommandRepository.createUser(user2);
-          await new Promise(resolve => setTimeout(resolve, 5)); // Small delay
+          await new Promise(resolve => setTimeout(resolve, 5));
           return "concurrent-2";
         }),
       ]);
@@ -208,12 +195,12 @@ describe("DrizzleUnitOfWork - Integration Tests", () => {
       expect(result1).toBe("concurrent-1");
       expect(result2).toBe("concurrent-2");
 
-      // Verify both users were persisted
       const totalUsers = await testDb.select({ count: count() }).from(usersTable);
       expect(totalUsers[0].count).toBe(2);
     });
 
     it("TC006: Should handle real-world workflow with validation and business logic", async () => {
+      // Arrange
       const user = new UserModel({
         email: "workflow@example.com",
         password: "$2b$10$validHashForWorkflow",
@@ -221,24 +208,19 @@ describe("DrizzleUnitOfWork - Integration Tests", () => {
         emailConfirmed: false,
       });
 
-      // Complex workflow: create user, activate, confirm email, update password
+      // Act
       const result = await unitOfWork.execute(async (ctx: RepositoryContext) => {
-        // Create user
         await ctx.userCommandRepository.createUser(user);
 
-        // Business logic: activate user
         user.activate();
         await ctx.userCommandRepository.updateUser(user);
 
-        // Business logic: confirm email
         user.confirmEmail();
         await ctx.userCommandRepository.updateUser(user);
 
-        // Business logic: update password
         user.updatePassword("$2b$10$newValidHashForWorkflow");
         await ctx.userCommandRepository.updateUser(user);
 
-        // Verify business rules
         if (!user.canAuthenticate()) {
           throw new Error("User should be able to authenticate");
         }
@@ -251,12 +233,12 @@ describe("DrizzleUnitOfWork - Integration Tests", () => {
         };
       });
 
-      // Verify result
+      // Assert
+      expect(result.userId).toBe(user.id);
       expect(result.canAuth).toBe(true);
       expect(result.isActive).toBe(true);
       expect(result.emailConfirmed).toBe(true);
 
-      // Verify final state in database
       const savedUser = await testDb
         .select()
         .from(usersTable)

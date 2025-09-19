@@ -47,7 +47,6 @@ describe("ForgotPasswordHandler", () => {
     userQueryRepo = unitRef.get(USER_QUERY_REPOSITORY);
     emailConfigService = unitRef.get(EMAIL_CONFIG_SERVICE);
 
-    // Setup EmailConfigService mock values
     emailConfigService.appName = "My App";
     emailConfigService.supportEmail = "Lx0dR@example.com";
     emailConfigService.baseUrl = "https://example.com";
@@ -223,7 +222,6 @@ describe("ForgotPasswordHandler", () => {
         mockUser.id,
         "password-recovery",
       );
-      // Verify invalidation is called before token generation
       expect(tokenInvalidationRepo.invalidateAllUserTokens).toHaveBeenCalled();
       expect(tokenService.generateToken).toHaveBeenCalled();
     });

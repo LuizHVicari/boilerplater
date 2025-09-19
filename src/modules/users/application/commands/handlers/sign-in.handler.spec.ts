@@ -208,7 +208,6 @@ describe("SignInHandler", () => {
       // Act & Assert
       await expect(handler.execute(command)).rejects.toThrow(InvalidCredentialsError);
 
-      // CRITICAL: This test ensures timing attack protection is not removed
       expect(passwordService.verifyPassword).toHaveBeenCalledWith(
         password,
         "$2b$10$dummyHashForTimingAttackProtection",

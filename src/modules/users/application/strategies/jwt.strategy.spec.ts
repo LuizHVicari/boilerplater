@@ -84,7 +84,6 @@ describe("JwtStrategy", () => {
       });
       expect(queryBus.execute).toHaveBeenCalledWith(expect.any(ValidateAuthTokenQuery));
 
-      // Verify the query was called with the correct AuthToken
       const calledQuery = queryBus.execute.mock.calls[0][0] as ValidateAuthTokenQuery;
       expect(calledQuery.authToken.sub).toBe(payload.sub);
       expect(calledQuery.authToken.type).toBe(payload.type);
