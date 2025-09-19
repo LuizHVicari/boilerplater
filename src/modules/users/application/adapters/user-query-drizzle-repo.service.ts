@@ -1,5 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { and, count, eq, gte, like, lte, or, SQL } from "drizzle-orm";
+import { and, count, eq, gte, ilike, like, lte, or, SQL } from "drizzle-orm";
 import { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { AnyPgColumn } from "drizzle-orm/pg-core";
 import { DB_TOKEN } from "src/db";
@@ -62,9 +62,9 @@ export class UserQueryDrizzleRepository implements UserQueryRepository {
     }
 
     const searchCondition = or(
-      like(usersTable.firstName, `%${props.search}%`),
-      like(usersTable.lastName, `%${props.search}%`),
-      like(usersTable.email, `%${props.search}%`),
+      ilike(usersTable.firstName, `%${props.search}%`),
+      ilike(usersTable.lastName, `%${props.search}%`),
+      ilike(usersTable.email, `%${props.search}%`),
     );
 
     return searchCondition ? [searchCondition] : [];
