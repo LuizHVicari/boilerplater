@@ -12,6 +12,7 @@ import { EMAIL_SERVICE } from "./application/ports/email.service";
 import { UNIT_OF_WORK } from "./application/ports/unit-of-work.service";
 import cacheConfig from "./config/cache.config";
 import emailConfig from "./config/email.config";
+import { GqlThrottlerGuard } from "./presentation/graphql/gql-throttler.guard";
 
 @Global()
 @Module({
@@ -61,7 +62,8 @@ import emailConfig from "./config/email.config";
       provide: EMAIL_SERVICE,
       useClass: NodeMailerEmailService,
     },
+    GqlThrottlerGuard,
   ],
-  exports: [DB_TOKEN, UNIT_OF_WORK, CACHE_SERVICE, EMAIL_SERVICE],
+  exports: [DB_TOKEN, UNIT_OF_WORK, CACHE_SERVICE, EMAIL_SERVICE, GqlThrottlerGuard],
 })
 export class CommonModule {}

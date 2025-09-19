@@ -1,14 +1,17 @@
 import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
+import { APP_GUARD } from "@nestjs/core";
 import { CqrsModule } from "@nestjs/cqrs";
 import { GraphQLModule } from "@nestjs/graphql";
+import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 import { join } from "path";
 
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { CommonModule } from "./modules/common/common.module";
 import { UsersModule } from "./modules/users/users.module";
+import { ONE_MINUTE_MILLISECONDS } from "./shared/constants/time-units.constants";
 
 @Module({
   imports: [
@@ -20,10 +23,19 @@ import { UsersModule } from "./modules/users/users.module";
       playground: true,
     }),
     ConfigModule.forRoot(),
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          name: "default",
+          ttl: ONE_MINUTE_MILLISECONDS,
+          limit: 100,
+        },
+      ],
+    }),
     UsersModule,
     CommonModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 export class AppModule {}
