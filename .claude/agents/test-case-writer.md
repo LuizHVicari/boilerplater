@@ -56,49 +56,109 @@ Generate ONLY these essential scenarios:
 
 ```typescript
 /*
-Test Cases for [ClassName].[methodName]:
+Test Cases for [ClassName]:
+  Method Name: [methodName]
+    Method Purpose: [One sentence describing what the method does]
 
-Method Purpose: [One sentence describing what the method does]
+    1. **Happy Path**: Should [behavior] when [normal valid input]
+    2. **Error**: Should throw [ErrorType] when [main business rule violation]
+    3. **Verification**: Should call [dependency].[method] with [expected parameters]
 
-1. **Happy Path**: Should [behavior] when [normal valid input]
-2. **Happy Path**: Should [behavior] when [another normal scenario]  
-3. **Error**: Should throw [ErrorType] when [main business rule violation]
-4. **Error**: Should handle [dependency] failure by [expected behavior]
-5. **Error**: Should reject [invalid condition] with [expected error]
-6. **Verification**: Should call [dependency].[method] with [expected parameters]
-7. **Verification**: Should return [expected result] containing [key fields]
+  Method Name: [anotherMethodName]
+    Method Purpose: [One sentence describing what the method does]
+
+    4. **Happy Path**: Should [behavior] when [normal valid input]
+    5. **Error**: Should [behavior] when [error condition]
+
+  6. **Integration**: Should [integration test description]
+  7. **Edge Case**: Should [edge case description]
 */
 
-describe('[ClassName].[methodName]', () => {
-  // TODO: Implement tests based on cases above
-  // This file was created by Test Case Writer Agent
-  // Test Implementation Agent should implement the actual test code
+import { [ClassName] } from "./[filename]";
+
+describe("[ClassName]", () => {
+  let [instanceName]: [ClassName];
+
+  beforeAll(() => {
+    [instanceName] = new [ClassName]();
+  });
+
+  describe("[methodName]", () => {
+    it("TC001: Should [description]", () => {});
+    it("TC002: Should [description]", () => {});
+    it("TC003: Should [description]", () => {});
+  });
+
+  describe("[anotherMethodName]", () => {
+    it("TC004: Should [description]", () => {});
+    it("TC005: Should [description]", () => {});
+  });
+
+  describe("Integration", () => {
+    it("TC006: Should [integration test description]", () => {});
+  });
+
+  describe("Edge Case", () => {
+    it("TC007: Should [edge case description]", () => {});
+  });
 });
 ```
 
 ## Example Output
 
-**File**: `auth-interactor.spec.ts`
+**File**: `user-model-schema.mapper.spec.ts`
 
 ```typescript
 /*
-Test Cases for AuthInteractor.signUp:
+Test Cases for UserModelSchemaMapper:
+  Method Name: model2DB
+    Method Purpose: Convert UserModel to DBNewUser
 
-Method Purpose: Creates a new user account with email verification
+    1. **Happy Path**: Should convert UserModel to DBNewUser with all fields
+    2. **Required Fields**: Should map required fields (id, email, password, active)
+    3. **Optional Fields**: Should map optional fields (firstName, lastName, etc.)
+    4. **Null Values**: Should handle UserModel with undefined optional fields
 
-1. **Happy Path**: Should create user and return success result when valid signup data provided
-2. **Happy Path**: Should hash password and send verification email when user created successfully
-3. **Error**: Should throw ConflictException when user email already exists
-4. **Error**: Should handle UserCommandRepository failure and propagate database errors
-5. **Error**: Should throw ValidationException when password requirements not met
-6. **Verification**: Should call PasswordService.hash with provided password before user creation
-7. **Verification**: Should return SignUpResult with success=true and userId when completed
+  Method Name: dB2Model
+    Method Purpose: Convert DBUser to UserModel
+
+    5. **Happy Path**: Should convert DBUser to UserModel with all fields
+    6. **Null Handling**: Should convert null database values to undefined
+    7. **Date Conversion**: Should handle null dates and convert to undefined
+
+  8. **Integration**: Should maintain data integrity through model2DB -> dB2Model
+  9. **Edge Case**: Should handle empty/minimal user data
 */
 
-describe('AuthInteractor.signUp', () => {
-  // TODO: Implement tests based on cases above
-  // This file was created by Test Case Writer Agent
-  // Test Implementation Agent should implement the actual test code
+import { UserModelSchemaMapper } from "./user-model-schema.mapper";
+
+describe("UserModelSchemaMapper", () => {
+  let mapper: UserModelSchemaMapper;
+
+  beforeAll(() => {
+    mapper = new UserModelSchemaMapper();
+  });
+
+  describe("model2DB", () => {
+    it("TC001: Should convert UserModel to DBNewUser with all fields", () => {});
+    it("TC002: Should map required fields (id, email, password, active)", () => {});
+    it("TC003: Should map optional fields (firstName, lastName, etc.)", () => {});
+    it("TC004: Should handle UserModel with undefined optional fields", () => {});
+  });
+
+  describe("dB2Model", () => {
+    it("TC005: Should convert DBUser to UserModel with all fields", () => {});
+    it("TC006: Should convert null database values to undefined", () => {});
+    it("TC007: Should handle null dates and convert to undefined", () => {});
+  });
+
+  describe("Integration", () => {
+    it("TC008: Should maintain data integrity through model2DB -> dB2Model", () => {});
+  });
+
+  describe("Edge Case", () => {
+    it("TC009: Should handle empty/minimal user data", () => {});
+  });
 });
 ```
 

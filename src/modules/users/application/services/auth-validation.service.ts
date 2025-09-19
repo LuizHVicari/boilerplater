@@ -1,4 +1,5 @@
-import { Inject, Injectable, UnauthorizedException } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
+import { InvalidCredentialsError } from "src/shared/errors/domain-errors";
 import { millisecondsToSeconds } from "src/shared/utils/time";
 
 import { UserModel } from "../../domain/models/user.model";
@@ -20,22 +21,20 @@ export class AuthValidationService {
 
   async validateAuthToken(authToken: AuthToken): Promise<UserModel> {
     if (!authToken.isValidForAuthentication()) {
-      throw new UnauthorizedException("Invalid token type");
+      throw new InvalidCredentialsError();
     }
     const user = await this.userQueryRepo.findUserById(authToken.sub);
     if (!user) {
-      throw new UnauthorizedException("User not found");
+      throw new InvalidCredentialsError();
     }
     if (!user.canAuthenticate()) {
-      throw new UnauthorizedException("Email not confirmed or user not active");
+      throw new InvalidCredentialsError();
     }
     if (
       user.lastCredentialInvalidation &&
       millisecondsToSeconds(user.lastCredentialInvalidation.getTime()) > authToken.iat
     ) {
-      throw new UnauthorizedException(
-        "User credentials have been invalidated since this token was issued",
-      );
+      throw new InvalidCredentialsError();
     }
 
     await this.tokenInvalidationRepo.verifyTokenValid(authToken);
